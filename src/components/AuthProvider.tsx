@@ -36,9 +36,9 @@ const AuthProvider = ({ children }: React.HTMLAttributes<HTMLDivElement>) => {
   useLayoutEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        // const response = await auth.get("/currentUser");
-        // console.log("cenotex",response.data);
-        // setCurrentUser(response.data.user);
+        const response = await auth.get("/currentUser");
+        console.log("cenotex",response.data);
+        setCurrentUser(response.data.user);
       } catch (error) {
         console.error("Failed to fetch current user:", error);
         setCurrentUser(null);

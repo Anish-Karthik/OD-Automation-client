@@ -1,17 +1,13 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
-  Users,
-  FileText,
-  Settings,
-  CreditCard,
-  Repeat,
-  Banknote as Bank,
-  Menu,
-  User2,
   LucideIcon,
+  Menu,
+  Settings,
+  User2,
+  Users
 } from "lucide-react";
+import React from "react";
 import { ScrollArea } from "./ui/scroll-area";
 
 interface SideBarProps {
@@ -27,11 +23,8 @@ interface Route {
 
 const routes: Route[] = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "Beneficiaries", path: "/beneficiaries", icon: Users },
-  { name: "Accounts", path: "/accounts", icon: Bank },
-  { name: "Transactions", path: "/transactions", icon: Repeat },
-  { name: "Upi", path: "/upi", icon: FileText },
-  { name: "Cards", path: "/cards", icon: CreditCard },
+  { name: "Students", path: "/students", icon: Users },
+  { name: "Teachers", path: "/teachers", icon: Users },
   { name: "Profile", path: "/profile", icon: User2 },
   { name: "Settings", path: "/settings", icon: Settings },
 ];

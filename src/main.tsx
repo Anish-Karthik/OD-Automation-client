@@ -10,14 +10,12 @@ import LoginPage from "./routes/auth/login";
 import SignUpPage from "./routes/auth/sign-up";
 import LandingPage from "./routes/Landing";
 import HomeLayoutPage from "./routes/protected/home-layout";
-import Dashboard from "./routes/protected/dashboard";
-import Accounts from "./routes/protected/accounts";
-import Transactions from "./routes/protected/transactions";
-import Upi from "./routes/protected/upi";
-import Cards from "./routes/protected/cards";
+import Dashboard from "./routes/protected/Dashboard";
+import Teachers from "./routes/protected/teachers";
 import Settings from "./routes/protected/settings";
 import Profile from "./routes/protected/profile";
-import Beneficiaries from "./routes/protected/beneficiaries";
+import Students from "./routes/protected/students";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const router = createBrowserRouter([
   {
@@ -53,28 +51,13 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
-        path: "/beneficiaries",
-        element: <Beneficiaries />,
+        path: "/students",
+        element: <Students />,
         errorElement: <ErrorPage />,
       },
       {
-        path: "/accounts",
-        element: <Accounts />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/transactions",
-        element: <Transactions />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/upi",
-        element: <Upi />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/cards",
-        element: <Cards />,
+        path: "/Teachers",
+        element: <Teachers />,
         errorElement: <ErrorPage />,
       },
       {
@@ -91,11 +74,15 @@ const router = createBrowserRouter([
   },
 ]);
 
+const queryClient = new QueryClient();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </AuthProvider>
+    </QueryClientProvider>
   </StrictMode>
 );

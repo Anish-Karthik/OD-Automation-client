@@ -55,23 +55,41 @@ import {
 } from "@/components/ui/pagination"
 import { Plus, MoreHorizontal, FileUp } from 'lucide-react'
 import * as XLSX from 'xlsx'
+import axios from 'axios'
+import { api } from '@/lib/axios'
 
 // Mock API functions (replace with actual API calls)
 const fetchTeachers = async () => {
-  // Simulated API call
-  return []
+ 
+  const res = await api.get('/user.teacher.list')
+  console.log('fetchTeachers', res.data)
+  return res.data.result.data
 }
 
 const createTeacher = async (data: Teacher) => {
   // Simulated API call
-  console.log('Creating teacher:', data)
-  return data
+
+  try {
+    const res = await api.post('/user.teacher.create', data)
+    console.log('createTeacher', res.data)
+    return res.data.result.data
+  }
+  catch (err) {
+    console.log('createTeacher', err)
+  }
 }
+
 
 const updateTeacher = async (data: Teacher) => {
   // Simulated API call
-  console.log('Updating teacher:', data)
-  return data
+ try {
+    const res = await api.post('/user.teacher.create', data)
+    console.log('updateTeacher', res.data)
+    return res.data.result.data
+  }
+  catch (err) {
+    console.log('updateTeacher', err)
+  }
 }
 
 const deleteTeacher = async (id: string) => {

@@ -59,6 +59,7 @@ const fetchStudents = async () => {
 
 const createStudent = async (data: Student) => {
   try {
+
     const res = await api.post("/user.student.create", data);
     return res.data.result;
   } catch (error) {
@@ -89,7 +90,7 @@ const bulkCreateStudents = async (data: Student[]) => {
 type Student = {
   id: string
   regNo: string
-  rollno: string
+  rollno: number
   name: string
   year: number
   section: string
@@ -106,7 +107,7 @@ type Student = {
 // Form schema
 const studentSchema = z.object({
   regNo: z.string().min(1, "Registration number is required"),
-  rollno: z.string().min(1, "Roll number is required"),
+  rollno: z.number().min(1, "Roll number is required"),
   name: z.string().min(1, "Name is required"),
   year: z.number().min(1).max(5),
   section: z.string().min(1, "Section is required"),
@@ -180,14 +181,13 @@ export default function Component() {
     resolver: zodResolver(studentSchema),
     defaultValues: {
       regNo: "",
-      rollno: "",
       name: "",
       year: 1,
       section: "",
       semester: 1,
       batch: null,
       email: null,
-      departmentId: null,
+      departmentId: "65f4607e11746c826b3f5128",
     },
   })
 
@@ -278,7 +278,7 @@ export default function Component() {
                       <FormItem>
                         <FormLabel>Roll Number</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value ?? ''} />
+                          <Input {...field} value={field.value ?? ''} onChange={(e) => field.onChange(parseInt(e.target.value))} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -443,7 +443,7 @@ export default function Component() {
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                
+
                 </DropdownMenu>
               </TableCell>
             </TableRow>

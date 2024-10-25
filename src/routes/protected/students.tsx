@@ -53,6 +53,7 @@ import { api } from '@/lib/axios'
 // Mock API functions (replace with actual API calls)
 const fetchStudents = async () => {
   const res = await api.get("/user.student.list");
+  console.log('Students:', res.data.result.data)
   return res.data.result.data;
 }
 
@@ -67,7 +68,7 @@ const createStudent = async (data: Student) => {
 }
 
 const updateStudent = async (data: Student) => {
-  // Simulated API call
+  // Simulated API callit 
   console.log('Updating student:', data)
   return data
 }
@@ -88,7 +89,7 @@ const bulkCreateStudents = async (data: Student[]) => {
 type Student = {
   id: string
   regNo: string
-  rollNo: string
+  rollno: string
   name: string
   year: number
   section: string
@@ -105,7 +106,7 @@ type Student = {
 // Form schema
 const studentSchema = z.object({
   regNo: z.string().min(1, "Registration number is required"),
-  rollNo: z.string().min(1, "Roll number is required"),
+  rollno: z.string().min(1, "Roll number is required"),
   name: z.string().min(1, "Name is required"),
   year: z.number().min(1).max(5),
   section: z.string().min(1, "Section is required"),
@@ -179,7 +180,7 @@ export default function Component() {
     resolver: zodResolver(studentSchema),
     defaultValues: {
       regNo: "",
-      rollNo: "",
+      rollno: "",
       name: "",
       year: 1,
       section: "",
@@ -272,7 +273,7 @@ export default function Component() {
                   />
                   <FormField
                     control={form.control}
-                    name="rollNo"
+                    name="rollno"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Roll Number</FormLabel>
@@ -419,7 +420,7 @@ export default function Component() {
           {paginatedStudents.map((student) => (
             <TableRow key={student.id}>
               <TableCell>{student.regNo}</TableCell>
-              <TableCell>{student.rollNo}</TableCell>
+              <TableCell>{student.rollno}</TableCell>
               <TableCell>{student.name}</TableCell>
               <TableCell>{student.year}</TableCell>
               <TableCell>{student.section}</TableCell>

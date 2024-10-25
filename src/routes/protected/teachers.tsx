@@ -91,14 +91,12 @@ type Teacher = {
   id: string
   name: string
   email: string
-  type: string
 }
 
 // Form schema
 const teacherSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  type: z.string().min(1, "Teacher type is required"),
 })
 
 export default function Component() {
@@ -166,7 +164,6 @@ export default function Component() {
     defaultValues: {
       name: "",
       email: "",
-      type: "",
     },
   })
 
@@ -262,29 +259,6 @@ export default function Component() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Teacher Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select teacher type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="professor">Professor</SelectItem>
-                          <SelectItem value="assistant">Assistant Professor</SelectItem>
-                          <SelectItem value="lecturer">Lecturer</SelectItem>
-                          <SelectItem value="adjunct">Adjunct Faculty</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Button type="submit">
                   {editingTeacher ? 'Update Teacher' : 'Add Teacher'}
                 </Button>
@@ -312,7 +286,6 @@ export default function Component() {
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Type</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -321,7 +294,6 @@ export default function Component() {
             <TableRow key={teacher.id}>
               <TableCell>{teacher.name}</TableCell>
               <TableCell>{teacher.email}</TableCell>
-              <TableCell>{teacher.type}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

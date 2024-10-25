@@ -1,14 +1,14 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://od-automation.onrender.com/api",
+  baseURL: " http://localhost:3000/trpc",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 export const auth = axios.create({
-  baseURL: "https://od-automation.onrender.com/api/auth",
+  baseURL: " http://localhost:3000/api/auth",
   headers: {
     "Content-Type": "application/json",
   },

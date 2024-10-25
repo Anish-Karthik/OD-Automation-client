@@ -7,6 +7,7 @@ interface TopBarProps {
   onMenuClick: () => void;
 }
 
+
 export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
   return (
     <header className="bg-white shadow-md">

@@ -48,17 +48,22 @@ import {
 } from "@/components/ui/pagination"
 import { Plus, MoreHorizontal, FileUp } from 'lucide-react'
 import * as XLSX from 'xlsx'
+import { api } from '@/lib/axios'
 
 // Mock API functions (replace with actual API calls)
 const fetchStudents = async () => {
-  // Simulated API call
-  return []
+  const res = await api.get("/user.student.list");
+  return res.data.result.data;
 }
 
 const createStudent = async (data: Student) => {
-  // Simulated API call
-  console.log('Creating student:', data)
-  return data
+  try {
+    const res = await api.post("/user.student.create", data);
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to create student:", error);
+    throw error;
+  }
 }
 
 const updateStudent = async (data: Student) => {
@@ -83,7 +88,7 @@ const bulkCreateStudents = async (data: Student[]) => {
 type Student = {
   id: string
   regNo: string
-  rollno: number
+  rollNo: string
   name: string
   year: number
   section: string
@@ -100,6 +105,7 @@ type Student = {
 // Form schema
 const studentSchema = z.object({
   regNo: z.string().min(1, "Registration number is required"),
+  rollNo: z.string().min(1, "Roll number is required"),
   name: z.string().min(1, "Name is required"),
   year: z.number().min(1).max(5),
   section: z.string().min(1, "Section is required"),
@@ -173,6 +179,7 @@ export default function Component() {
     resolver: zodResolver(studentSchema),
     defaultValues: {
       regNo: "",
+      rollNo: "",
       name: "",
       year: 1,
       section: "",
@@ -243,25 +250,40 @@ export default function Component() {
               <Plus className="mr-2 h-4 w-4" /> Add Student
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>{editingStudent ? 'Edit Student' : 'Add New Student'}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="regNo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Registration Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value ?? ''} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="regNo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Registration Number</FormLabel>
+                        <FormControl>
+                          <Input {...field} value={field.value ?? ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="rollNo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Roll Number</FormLabel>
+                        <FormControl>
+                          <Input {...field} value={field.value ?? ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name="name"
@@ -275,58 +297,62 @@ export default function Component() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="year"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Year</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="section"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Section</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="semester"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Semester</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="batch"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Batch</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value ?? ''} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Year</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="section"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Section</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="semester"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Semester</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="batch"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Batch</FormLabel>
+                        <FormControl>
+                          <Input {...field} value={field.value ?? ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name="email"
@@ -353,7 +379,7 @@ export default function Component() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit">
+                <Button type="submit" className="w-full">
                   {editingStudent ? 'Update Student' : 'Add Student'}
                 </Button>
               </form>
@@ -379,6 +405,7 @@ export default function Component() {
         <TableHeader>
           <TableRow>
             <TableHead>Reg No</TableHead>
+            <TableHead>Roll No</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Year</TableHead>
             <TableHead>Section</TableHead>
@@ -392,6 +419,7 @@ export default function Component() {
           {paginatedStudents.map((student) => (
             <TableRow key={student.id}>
               <TableCell>{student.regNo}</TableCell>
+              <TableCell>{student.rollNo}</TableCell>
               <TableCell>{student.name}</TableCell>
               <TableCell>{student.year}</TableCell>
               <TableCell>{student.section}</TableCell>
@@ -414,6 +442,7 @@ export default function Component() {
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
+                
                 </DropdownMenu>
               </TableCell>
             </TableRow>
@@ -441,7 +470,6 @@ export default function Component() {
           <PaginationItem>
             <PaginationNext
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              
               className={currentPage === totalPages ? "cursor-not-allowed opacity-50" : ""}
             />
           </PaginationItem>

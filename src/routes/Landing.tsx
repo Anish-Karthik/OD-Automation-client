@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   ArrowRight,
-  Lock,
-  Smartphone,
+  FileText,
+  Clock,
   Users,
-  Zap
+  CheckCircle
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -15,12 +15,12 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen w-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center">
         <Link className="flex items-center justify-center" to="#" >
-          <Smartphone className="h-6 w-6 text-primary" />
+          <FileText className="h-6 w-6 text-primary" />
           <span className="ml-2 text-2xl font-bold text-primary">
-            UPI-Netbanking
+            OD Automation
           </span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        {/* <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
             to="#features"
@@ -33,13 +33,7 @@ export default function LandingPage() {
           >
             How It Works
           </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="#testimonials"
-          >
-            Testimonials
-          </Link>
-        </nav>
+        </nav> */}
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-primary">
@@ -47,25 +41,25 @@ export default function LandingPage() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
-                  Seamless UPI & Netbanking Transactions
+                  Streamline Your OD Process
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-200 md:text-xl">
-                  Experience the future of digital payments with our secure,
-                  fast, and user-friendly UPI-Netbanking platform.
+                  Experience the future of On Duty management with our secure,
+                  fast, and user-friendly OD Automation platform.
                 </p>
               </div>
               <div className="space-x-4">
-                <Button className="bg-white text-primary hover:bg-gray-100" onClick={()=> {
+                <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => {
                   navigate("/dashboard");
                 }}>
                   Get Started
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   className="text-white border-white hover:bg-white hover:text-primary"
                 >
                   Learn More
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>
@@ -81,30 +75,28 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card>
                 <CardContent className="flex flex-col items-center p-6 space-y-4">
-                  <Lock className="h-12 w-12 text-primary" />
-                  <h3 className="text-xl font-bold">Secure Transactions</h3>
+                  <Clock className="h-12 w-12 text-primary" />
+                  <h3 className="text-xl font-bold">Time-Saving Automation</h3>
                   <p className="text-center text-gray-600">
-                    Bank-grade security measures to protect your financial data
-                    and transactions.
+                    Automate OD requests and approvals, saving time for both students and staff.
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="flex flex-col items-center p-6 space-y-4">
-                  <Zap className="h-12 w-12 text-primary" />
-                  <h3 className="text-xl font-bold">Instant Transfers</h3>
+                  <CheckCircle className="h-12 w-12 text-primary" />
+                  <h3 className="text-xl font-bold">Easy Tracking</h3>
                   <p className="text-center text-gray-600">
-                    Lightning-fast UPI transactions and quick netbanking
-                    transfers.
+                    Track OD status, history, and analytics with just a few clicks.
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="flex flex-col items-center p-6 space-y-4">
                   <Users className="h-12 w-12 text-primary" />
-                  <h3 className="text-xl font-bold">Multi-Bank Support</h3>
+                  <h3 className="text-xl font-bold">Multi-Level Approval</h3>
                   <p className="text-center text-gray-600">
-                    Connect and manage multiple bank accounts in one place.
+                    Streamlined approval process involving multiple authorities.
                   </p>
                 </CardContent>
               </Card>
@@ -121,33 +113,33 @@ export default function LandingPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                   1
                 </div>
-                <h3 className="text-xl font-bold">Sign Up</h3>
+                <h3 className="text-xl font-bold">Submit Request</h3>
                 <p className="text-gray-600">
-                  Create your account in minutes with easy verification.
+                  Students submit OD requests through the platform.
                 </p>
               </div>
               <div className="flex flex-col items-center space-y-2 text-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                   2
                 </div>
-                <h3 className="text-xl font-bold">Link Your Banks</h3>
+                <h3 className="text-xl font-bold">Automated Routing</h3>
                 <p className="text-gray-600">
-                  Securely connect your bank accounts to the platform.
+                  Requests are automatically routed to the appropriate authorities.
                 </p>
               </div>
               <div className="flex flex-col items-center space-y-2 text-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                   3
                 </div>
-                <h3 className="text-xl font-bold">Start Transacting</h3>
+                <h3 className="text-xl font-bold">Quick Approval</h3>
                 <p className="text-gray-600">
-                  Enjoy seamless UPI payments and netbanking transfers.
+                  Authorities review and approve requests efficiently.
                 </p>
               </div>
             </div>
           </div>
         </section>
-        <section
+        {/* <section
           id="testimonials"
           className="w-full py-12 md:py-24 lg:py-32 bg-gray-100"
         >
@@ -159,21 +151,21 @@ export default function LandingPage() {
               {[
                 {
                   name: "Alex Johnson",
-                  role: "Small Business Owner",
+                  role: "Student",
                   content:
-                    "UPI-Netbanking has revolutionized how I manage my business finances. It's fast, secure, and incredibly user-friendly!",
+                    "OD Automation has made requesting on-duty leave so much easier. No more running around for signatures!",
                 },
                 {
                   name: "Priya Sharma",
-                  role: "Freelance Designer",
+                  role: "Faculty Member",
                   content:
-                    "I love how easy it is to receive payments from clients across different banks. This app has made my financial life so much simpler.",
+                    "As a faculty advisor, this system has streamlined my workflow. I can quickly review and approve OD requests.",
                 },
                 {
                   name: "Michael Lee",
-                  role: "Student",
+                  role: "Department Head",
                   content:
-                    "As a student, I appreciate the zero-fee transfers and the ability to split bills easily with my roommates. It's a game-changer!",
+                    "The analytics provided by OD Automation help us make informed decisions about student activities and attendance.",
                 },
               ].map((testimonial, index) => (
                 <Card key={index}>
@@ -195,17 +187,16 @@ export default function LandingPage() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
       <footer className="w-full py-12 md:py-24 lg:py-32 bg-primary text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-              Ready to Get Started?
+              Ready to Streamline Your OD Process?
             </h2>
             <p className="mx-auto max-w-[600px] text-gray-200 md:text-xl">
-              Join thousands of satisfied users and experience the future of
-              digital banking today.
+              Join numerous institutions already benefiting from our OD Automation system.
             </p>
             <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => {
               navigate("/auth/signup");

@@ -69,16 +69,28 @@ const createStudent = async (data: Student) => {
 }
 
 const updateStudent = async (data: Student) => {
-  // Simulated API callit 
-  console.log('Updating student:', data)
-  return data
+
+  try {
+    const res = await api.post("/user.student.create", data);
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to update student:", error);
+    throw error;
+  }
+
 }
 
 const deleteStudent = async (id: string) => {
-  // Simulated API call
-  console.log('Deleting student:', id)
-  return id
-}
+  try {
+    // Send the `id` wrapped in an object
+    const res = await api.post("/user.delete", { id });
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to delete student:", error);
+    throw error;
+  }
+};
+
 
 const bulkCreateStudents = async (data: Student[]) => {
   // Simulated API call
@@ -439,7 +451,7 @@ export default function Component() {
                     <DropdownMenuItem onClick={() => handleEdit(student)}>
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(student.id)}>
+                    <DropdownMenuItem onClick={() => handleDelete(student.userId)}>
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>

@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import { useState, useRef } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Button } from "@/components/ui/button"
+import { useState, useRef, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -20,8 +20,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -29,15 +36,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { toast } from "@/hooks/use-toast"
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
 import {
   Pagination,
   PaginationContent,
@@ -45,68 +52,133 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
-import { Plus, MoreHorizontal, FileUp } from 'lucide-react'
-import * as XLSX from 'xlsx'
-import { api } from '@/lib/axios'
+} from "@/components/ui/pagination";
+import { Plus, MoreHorizontal, FileUp } from "lucide-react";
+import * as XLSX from "xlsx";
+import { api } from "@/lib/axios";
+
+type StudentForm = {
+  regNo: string;
+  rollno: number;
+  name: string;
+  year: string;
+  section: string;
+  semester: string;
+  batch: string;
+  email: string | null;
+  departmentId: string | null;
+};
+
+type StudentUpdateForm = StudentForm & {
+  id: string;
+};
 
 // Student type
-type Student = {
-  id: string
-  regNo: string
-  rollno: number
-  name: string
-  year: number
-  section: string
-  semester: number
-  vertical: string | null
-  batch: string | null
-  email: string | null
-  userId: string
-  tutorId: string | null
-  yearInChargeId: string | null
-  departmentId: string | null
-}
+type Student = StudentUpdateForm & {
+  vertical: string | null;
+  userId: string;
+  tutorId: string | null;
+  yearInChargeId: string | null;
+  departmentId: string | null;
+};
+
+type Department = {
+  id: string;
+  name: string;
+  code: string;
+};
+
+// Helper function to generate year options
+const generateYearOptions = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let year = 2000; year <= currentYear + 6; year++) {
+    years.push(year.toString());
+  }
+  return years;
+};
 
 // Form schema
-const studentSchema = z.object({
-  regNo: z.string().min(1, "Registration number is required"),
-  rollno: z.number().min(1, "Roll number is required"),
-  name: z.string().min(1, "Name is required"),
-  year: z.number().min(1).max(5),
-  section: z.string().min(1, "Section is required"),
-  semester: z.number().min(1).max(10),
-  batch: z.string().nullable(),
-  email: z.string().email().nullable(),
-  departmentId: z.string().nullable(),
-})
+const studentSchema = z
+  .object({
+    regNo: z.string().min(1, "Registration number is required"),
+    rollno: z.number().min(1, "Roll number is required"),
+    name: z.string().min(1, "Name is required"),
+    year: z.union([z.enum(["1", "2", "3", "4"]), z.string().regex(/^[5-6]$/)]),
+    section: z.union([
+      z.enum(["A", "B", "C", "D"]),
+      z.string().min(1, "Section is required"),
+    ]),
+    semester: z.enum(["1", "2", "3", "4", "5", "6", "7", "8"]),
+    batch: z
+      .string()
+      .min(1, "Batch is required")
+      .refine(
+        (value) => {
+          return generateYearOptions().includes(value);
+        },
+        {
+          message: "Invalid batch Year, please select from the dropdown",
+        }
+      ),
+    email: z.string().email().nullable(),
+    departmentId: z.string().nullable(),
+  })
+  .refine(
+    (data) => {
+      const year = Number.parseInt(data.year);
+      const semester = Number.parseInt(data.semester);
+      return (
+        (year === 1 && (semester === 1 || semester === 2)) ||
+        (year === 2 && (semester === 3 || semester === 4)) ||
+        (year === 3 && (semester === 5 || semester === 6)) ||
+        (year === 4 && (semester === 7 || semester === 8)) ||
+        (year >= 5 && semester >= 1 && semester <= 8)
+      );
+    },
+    {
+      message: "Invalid year and semester combination",
+      path: ["semester"],
+    }
+  );
 
 // API functions
 const fetchStudents = async () => {
   const res = await api.get("/user.student.list");
-  console.log('Students:', res.data.result.data)
+  console.log("Students:", res.data.result.data);
   return res.data.result.data;
-}
-
-const createStudent = async (data: Student) => {
+};
+const fetchDepartments = async () => {
+  const res = await api.get("/department.getAll");
+  return res.data.result.data;
+};
+const createStudent = async (data: StudentForm) => {
   try {
-    const res = await api.post("/user.student.create", data);
+    const res = await api.post("/user.student.create", {
+      ...data,
+      year: Number.parseInt(data.year),
+      semester: Number.parseInt(data.semester),
+    });
     return res.data.result;
   } catch (error) {
     console.error("Failed to create student:", error);
     throw error;
   }
-}
+};
 
-const updateStudent = async (data: Student) => {
+const updateStudent = async (data: StudentUpdateForm) => {
   try {
-    const res = await api.post("/user.student.update", data);
+    const res = await api.post("/user.student.update", {
+      ...data,
+      year: Number.parseInt(data.year),
+      semester: Number.parseInt(data.semester),
+    });
     return res.data.result;
   } catch (error) {
     console.error("Failed to update student:", error);
     throw error;
   }
-}
+};
 
 const deleteStudent = async (id: string) => {
   try {
@@ -116,154 +188,188 @@ const deleteStudent = async (id: string) => {
     console.error("Failed to delete student:", error);
     throw error;
   }
-}
+};
 
 const bulkCreateStudents = async (data: Student[]) => {
   try {
-    // Send the data array directly without wrapping it in an object
     const res = await api.post("/user.student.createMany", data);
     return res.data.result;
   } catch (error) {
     console.error("Failed to bulk create students:", error);
     throw error;
   }
-}
-
+};
 
 export default function Component() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const itemsPerPage = 10
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const itemsPerPage = 10;
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const { data: students = [], isLoading } = useQuery<Student[], Error>({
-    queryKey: ['students'],
+    queryKey: ["students"],
     queryFn: fetchStudents,
-  })
-
+  });
+  const { data: departments = [] } = useQuery<
+    Department[],
+    Error
+  >({
+    queryKey: ["departments"],
+    queryFn: fetchDepartments,
+  });
   const createMutation = useMutation({
     mutationFn: createStudent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] })
-      toast({ title: "Student created successfully" })
-      setIsAddDialogOpen(false)
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({ title: "Student created successfully" });
+      setIsAddDialogOpen(false);
     },
     onError: () => {
-      toast({ title: "Failed to create student", variant: "destructive" })
+      toast({ title: "Failed to create student", variant: "destructive" });
     },
-  })
+  });
 
   const updateMutation = useMutation({
     mutationFn: updateStudent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] })
-      toast({ title: "Student updated successfully" })
-      setIsAddDialogOpen(false)
-      setEditingStudent(null)
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({ title: "Student updated successfully" });
+      setIsAddDialogOpen(false);
+      setEditingStudent(null);
     },
     onError: () => {
-      toast({ title: "Failed to update student", variant: "destructive" })
+      toast({ title: "Failed to update student", variant: "destructive" });
     },
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: deleteStudent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] })
-      toast({ title: "Student deleted successfully" })
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({ title: "Student deleted successfully" });
     },
     onError: () => {
-      toast({ title: "Failed to delete student", variant: "destructive" })
+      toast({ title: "Failed to delete student", variant: "destructive" });
     },
-  })
+  });
 
   const bulkCreateMutation = useMutation({
     mutationFn: bulkCreateStudents,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] })
-      toast({ title: "Students bulk uploaded successfully" })
-      setIsUploading(false)
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({ title: "Students bulk uploaded successfully" });
+      setIsUploading(false);
     },
     onError: () => {
-      toast({ title: "Failed to bulk upload students", variant: "destructive" })
-      setIsUploading(false)
+      toast({
+        title: "Failed to bulk upload students",
+        variant: "destructive",
+      });
+      setIsUploading(false);
     },
-  })
+  });
 
   const form = useForm<z.infer<typeof studentSchema>>({
     resolver: zodResolver(studentSchema),
     defaultValues: {
       regNo: "",
+      rollno: 1,
       name: "",
-      year: 1,
-      section: "",
-      semester: 1,
-      batch: null,
+      year: "1",
+      section: "A",
+      semester: "1",
+      batch: new Date().getFullYear().toString(),
       email: null,
-      departmentId: "65f4607e11746c826b3f5128",
+      departmentId: departments[0]?.id ?? "",
     },
-  })
+  });
+
+  const year = form.watch("year");
+
+  useEffect(() => {
+    if (year) {
+      form.setValue(
+        "semester",
+        String(Number(year) * 2 - 1) as
+          | "1"
+          | "2"
+          | "3"
+          | "4"
+          | "5"
+          | "6"
+          | "7"
+          | "8"
+      );
+    }
+  }, [year, form]);
 
   const onSubmit = (data: z.infer<typeof studentSchema>) => {
     if (editingStudent) {
-      updateMutation.mutate({ ...editingStudent, ...data })
+      updateMutation.mutate({ ...editingStudent, ...data });
     } else {
-      createMutation.mutate(data as Student)
+      createMutation.mutate(data);
     }
-  }
+  };
 
   const handleEdit = (student: Student) => {
-    setEditingStudent(student)
-    form.reset(student)
-    setIsAddDialogOpen(true)
-  }
+    setEditingStudent(student);
+    form.reset({
+      ...student,
+      year: student.year.toString() as any,
+      semester: student.semester.toString() as any,
+      batch: student.batch ?? "", // Ensure batch is not null
+    });
+    setIsAddDialogOpen(true);
+  };
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this student?")) {
-      deleteMutation.mutate(id)
+      deleteMutation.mutate(id);
     }
-  }
+  };
 
-  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const handleBulkUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
     if (file) {
-      setIsUploading(true)
-      const reader = new FileReader()
+      setIsUploading(true);
+      const reader = new FileReader();
       reader.onload = async (e) => {
         try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer)
-          const workbook = XLSX.read(data, { type: 'array' })
-          const sheetName = workbook.SheetNames[0]
-          const worksheet = workbook.Sheets[sheetName]
-          const jsonData = XLSX.utils.sheet_to_json(worksheet) as Student[]
-          await bulkCreateMutation.mutateAsync(jsonData)
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet) as Student[];
+          await bulkCreateMutation.mutateAsync(jsonData);
         } catch (error) {
-          console.error("Error processing file:", error)
-          toast({ title: "Error processing file", variant: "destructive" })
-          setIsUploading(false)
+          console.error("Error processing file:", error);
+          toast({ title: "Error processing file", variant: "destructive" });
+          setIsUploading(false);
         }
-      }
-      reader.readAsArrayBuffer(file)
+      };
+      reader.readAsArrayBuffer(file);
     }
-  }
+  };
 
   const handleBulkUploadClick = () => {
-    fileInputRef.current?.click()
-  }
+    fileInputRef.current?.click();
+  };
 
   const paginatedStudents = students.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  )
+  );
 
-  const totalPages = Math.ceil(students.length / itemsPerPage)
+  const totalPages = Math.ceil(students.length / itemsPerPage);
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -272,19 +378,26 @@ export default function Component() {
       <div className="flex justify-between items-center mb-6">
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
-              setEditingStudent(null)
-              form.reset()
-            }}>
+            <Button
+              onClick={() => {
+                setEditingStudent(null);
+                form.reset();
+              }}
+            >
               <Plus className="mr-2 h-4 w-4" /> Add Student
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>{editingStudent ? 'Edit Student' : 'Add New Student'}</DialogTitle>
+              <DialogTitle>
+                {editingStudent ? "Edit Student" : "Add New Student"}
+              </DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -293,7 +406,7 @@ export default function Component() {
                       <FormItem>
                         <FormLabel>Registration Number</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value ?? ''} />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -306,7 +419,13 @@ export default function Component() {
                       <FormItem>
                         <FormLabel>Roll Number</FormLabel>
                         <FormControl>
-                          <Input {...field} value={field.value ?? ''} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                          <Input
+                            {...field}
+                            type="number"
+                            onChange={(e) =>
+                              field.onChange(Number.parseInt(e.target.value))
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -326,62 +445,163 @@ export default function Component() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="year"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Year</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="batch"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Batch</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
-                          <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select batch" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="section"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Section</FormLabel>
+                        <SelectContent>
+                          {generateYearOptions().map((year) => (
+                            <SelectItem key={year} value={year}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="year"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Year</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
-                          <Input {...field} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select year" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="semester"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Semester</FormLabel>
+                        <SelectContent>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="2">2</SelectItem>
+                          <SelectItem value="3">3</SelectItem>
+                          <SelectItem value="4">4</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {field.value === "other" && (
+                        <Input
+                          type="number"
+                          placeholder="Enter year (5-6)"
+                          onChange={(e) => field.onChange(e.target.value)}
+                          min={5}
+                          max={6}
+                        />
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="semester"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Semester</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={!year}
+                      >
                         <FormControl>
-                          <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select semester" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="batch"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Batch</FormLabel>
+                        <SelectContent>
+                          {year === "1" && (
+                            <>
+                              <SelectItem value="1">1</SelectItem>
+                              <SelectItem value="2">2</SelectItem>
+                            </>
+                          )}
+                          {year === "2" && (
+                            <>
+                              <SelectItem value="3">3</SelectItem>
+                              <SelectItem value="4">4</SelectItem>
+                            </>
+                          )}
+                          {year === "3" && (
+                            <>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="6">6</SelectItem>
+                            </>
+                          )}
+                          {year === "4" && (
+                            <>
+                              <SelectItem value="7">7</SelectItem>
+                              <SelectItem value="8">8</SelectItem>
+                            </>
+                          )}
+                          {(year === "5" ||
+                            year === "6" ||
+                            year === "other") && (
+                            <>
+                              <SelectItem value="1">1</SelectItem>
+                              <SelectItem value="2">2</SelectItem>
+                              <SelectItem value="3">3</SelectItem>
+                              <SelectItem value="4">4</SelectItem>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="6">6</SelectItem>
+                              <SelectItem value="7">7</SelectItem>
+                              <SelectItem value="8">8</SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="section"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Section</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
-                          <Input {...field} value={field.value ?? ''} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select section" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                        <SelectContent>
+                          <SelectItem value="A">A</SelectItem>
+                          <SelectItem value="B">B</SelectItem>
+                          <SelectItem value="C">C</SelectItem>
+                          <SelectItem value="D">D</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {field.value === "other" && (
+                        <Input
+                          placeholder="Enter section"
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="email"
@@ -389,7 +609,11 @@ export default function Component() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" {...field} value={field.value ?? ''} />
+                        <Input
+                          type="email"
+                          {...field}
+                          value={field.value ?? ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -400,16 +624,32 @@ export default function Component() {
                   name="departmentId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Department ID</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value ?? ''} />
-                      </FormControl>
+                      <FormLabel>Department</FormLabel>
+                      {departments?.length && (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value!}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select department" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {departments?.map((dept) => (
+                              <SelectItem key={dept.id} value={dept.id}>
+                                {dept.name} ({dept.code})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button type="submit" className="w-full">
-                  {editingStudent ? 'Update Student' : 'Add Student'}
+                  {editingStudent ? "Update Student" : "Add Student"}
                 </Button>
               </form>
             </Form>
@@ -425,9 +665,13 @@ export default function Component() {
             disabled={isUploading}
             ref={fileInputRef}
           />
-          <Button type='button' onClick={handleBulkUploadClick} disabled={isUploading}>
+          <Button
+            type="button"
+            onClick={handleBulkUploadClick}
+            disabled={isUploading}
+          >
             <FileUp className="mr-2 h-4 w-4" />
-            {isUploading ? 'Uploading...' : 'Bulk Upload'}
+            {isUploading ? "Uploading..." : "Bulk Upload"}
           </Button>
         </div>
       </div>
@@ -447,7 +691,7 @@ export default function Component() {
         </TableHeader>
         <TableBody>
           {paginatedStudents.map((student) => (
-            <TableRow  key={student.id}>
+            <TableRow key={student.id}>
               <TableCell>{student.regNo}</TableCell>
               <TableCell>{student.rollno}</TableCell>
               <TableCell>{student.name}</TableCell>
@@ -469,7 +713,9 @@ export default function Component() {
                     <DropdownMenuItem onClick={() => handleEdit(student)}>
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(student.userId)}>
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(student.userId)}
+                    >
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -484,7 +730,9 @@ export default function Component() {
           <PaginationItem>
             <PaginationPrevious
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className={currentPage === 1 ? "cursor-not-allowed opacity-50" : ""}
+              className={
+                currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
+              }
             />
           </PaginationItem>
           {[...Array(totalPages)].map((_, i) => (
@@ -499,12 +747,18 @@ export default function Component() {
           ))}
           <PaginationItem>
             <PaginationNext
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              className={currentPage === totalPages ? "cursor-not-allowed opacity-50" : ""}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              className={
+                currentPage === totalPages
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }
             />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
     </div>
-  )
+  );
 }

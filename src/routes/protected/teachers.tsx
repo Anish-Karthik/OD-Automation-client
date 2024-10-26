@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -86,14 +86,14 @@ const createTeacher = async (data: Teacher) => {
 
 const updateTeacher = async (data: Teacher) => {
   const res = await api.post("/user.teacher.create", data);
-  
+
   return res.data.result.data;
 };
 
 const deleteTeacher = async (id: string) => {
-   
+
   try {
-    const res = await api.post('/user.delete', {id})
+    const res = await api.post('/user.delete', { id })
     console.log('deleteTeacher', res.data)
     return res.data.result.data
   }
@@ -104,7 +104,7 @@ const deleteTeacher = async (id: string) => {
 }
 
 const bulkCreateTeachers = async (data: Teacher[]) => {
-  const res = await api.post("/user.teacher.bulkCreate", { teachers: data });
+  const res = await api.post("/user.teacher.createMany", data);
   return res.data.result.data;
 };
 
@@ -125,6 +125,8 @@ export default function TeacherManagement() {
   const [isAssignRoleDialogOpen, setIsAssignRoleDialogOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient();
@@ -233,21 +235,44 @@ export default function TeacherManagement() {
     }
   };
 
-  const handleBulkUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("File uploaded:", event.target.files?.[0]);
     const file = event.target.files?.[0];
     if (file) {
+      console.log("Uploading file:", file);
+      setIsUploading(true);
+
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet) as Teacher[];
-        bulkCreateMutation.mutate(jsonData);
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet) as Teacher[];
+          await bulkCreateMutation.mutateAsync(jsonData);
+        } catch (error) {
+          console.error("Error processing file:", error);
+          toast({ title: "Error processing file", variant: "destructive" });
+          setIsUploading(false);
+        } finally {
+          setIsUploading(false);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Clear the file input
+          }
+        }
       };
       reader.readAsArrayBuffer(file);
     }
   };
+
+
+  const handleBulkUploadClick = () => {
+    console.log("Bulk upload clicked");
+    fileInputRef.current?.click();
+  };
+
 
   const handleAssignRole = (teacher: Teacher) => {
     setSelectedTeacher(teacher);
@@ -335,12 +360,17 @@ export default function TeacherManagement() {
             onChange={handleBulkUpload}
             className="hidden"
             id="bulk-upload"
+            disabled={isUploading}
+            ref={fileInputRef}
           />
-          <label htmlFor="bulk-upload">
-            <Button type="button">
-              <FileUp className="mr-2 h-4 w-4" /> Bulk Upload
-            </Button>
-          </label>
+          <Button
+            type="button"
+            onClick={handleBulkUploadClick}
+            disabled={isUploading}
+          >
+            <FileUp className="mr-2 h-4 w-4" />
+            {isUploading ? "Uploading..." : "Bulk Upload"}
+          </Button>
         </div>
       </div>
       <Table>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -50,54 +50,6 @@ import { Plus, MoreHorizontal, FileUp } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { api } from '@/lib/axios'
 
-// Mock API functions (replace with actual API calls)
-const fetchStudents = async () => {
-  const res = await api.get("/user.student.list");
-  console.log('Students:', res.data.result.data)
-  return res.data.result.data;
-}
-
-const createStudent = async (data: Student) => {
-  try {
-
-    const res = await api.post("/user.student.create", data);
-    return res.data.result;
-  } catch (error) {
-    console.error("Failed to create student:", error);
-    throw error;
-  }
-}
-
-const updateStudent = async (data: Student) => {
-
-  try {
-    const res = await api.post("/user.student.create", data);
-    return res.data.result;
-  } catch (error) {
-    console.error("Failed to update student:", error);
-    throw error;
-  }
-
-}
-
-const deleteStudent = async (id: string) => {
-  try {
-    // Send the `id` wrapped in an object
-    const res = await api.post("/user.delete", { id });
-    return res.data.result;
-  } catch (error) {
-    console.error("Failed to delete student:", error);
-    throw error;
-  }
-};
-
-
-const bulkCreateStudents = async (data: Student[]) => {
-  // Simulated API call
-  console.log('Bulk creating students:', data)
-  return data
-}
-
 // Student type
 type Student = {
   id: string
@@ -129,10 +81,61 @@ const studentSchema = z.object({
   departmentId: z.string().nullable(),
 })
 
+// API functions
+const fetchStudents = async () => {
+  const res = await api.get("/user.student.list");
+  console.log('Students:', res.data.result.data)
+  return res.data.result.data;
+}
+
+const createStudent = async (data: Student) => {
+  try {
+    const res = await api.post("/user.student.create", data);
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to create student:", error);
+    throw error;
+  }
+}
+
+const updateStudent = async (data: Student) => {
+  try {
+    const res = await api.post("/user.student.update", data);
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to update student:", error);
+    throw error;
+  }
+}
+
+const deleteStudent = async (id: string) => {
+  try {
+    const res = await api.post("/user.delete", { id });
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to delete student:", error);
+    throw error;
+  }
+}
+
+const bulkCreateStudents = async (data: Student[]) => {
+  try {
+    // Send the data array directly without wrapping it in an object
+    const res = await api.post("/user.student.createMany", data);
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to bulk create students:", error);
+    throw error;
+  }
+}
+
+
 export default function Component() {
   const [currentPage, setCurrentPage] = useState(1)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editingStudent, setEditingStudent] = useState<Student | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const itemsPerPage = 10
 
   const queryClient = useQueryClient()
@@ -183,9 +186,11 @@ export default function Component() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] })
       toast({ title: "Students bulk uploaded successfully" })
+      setIsUploading(false)
     },
     onError: () => {
       toast({ title: "Failed to bulk upload students", variant: "destructive" })
+      setIsUploading(false)
     },
   })
 
@@ -223,20 +228,31 @@ export default function Component() {
     }
   }
 
-  const handleBulkUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      setIsUploading(true)
       const reader = new FileReader()
-      reader.onload = (e) => {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer)
-        const workbook = XLSX.read(data, { type: 'array' })
-        const sheetName = workbook.SheetNames[0]
-        const worksheet = workbook.Sheets[sheetName]
-        const jsonData = XLSX.utils.sheet_to_json(worksheet) as Student[]
-        bulkCreateMutation.mutate(jsonData)
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer)
+          const workbook = XLSX.read(data, { type: 'array' })
+          const sheetName = workbook.SheetNames[0]
+          const worksheet = workbook.Sheets[sheetName]
+          const jsonData = XLSX.utils.sheet_to_json(worksheet) as Student[]
+          await bulkCreateMutation.mutateAsync(jsonData)
+        } catch (error) {
+          console.error("Error processing file:", error)
+          toast({ title: "Error processing file", variant: "destructive" })
+          setIsUploading(false)
+        }
       }
       reader.readAsArrayBuffer(file)
     }
+  }
+
+  const handleBulkUploadClick = () => {
+    fileInputRef.current?.click()
   }
 
   const paginatedStudents = students.slice(
@@ -406,12 +422,13 @@ export default function Component() {
             onChange={handleBulkUpload}
             className="hidden"
             id="bulk-upload"
+            disabled={isUploading}
+            ref={fileInputRef}
           />
-          <label htmlFor="bulk-upload">
-            <Button type='button'>
-              <FileUp className="mr-2 h-4 w-4" /> Bulk Upload
-            </Button>
-          </label>
+          <Button type='button' onClick={handleBulkUploadClick} disabled={isUploading}>
+            <FileUp className="mr-2 h-4 w-4" />
+            {isUploading ? 'Uploading...' : 'Bulk Upload'}
+          </Button>
         </div>
       </div>
       <Table>
@@ -430,7 +447,7 @@ export default function Component() {
         </TableHeader>
         <TableBody>
           {paginatedStudents.map((student) => (
-            <TableRow key={student.id}>
+            <TableRow  key={student.id}>
               <TableCell>{student.regNo}</TableCell>
               <TableCell>{student.rollno}</TableCell>
               <TableCell>{student.name}</TableCell>
@@ -443,6 +460,7 @@ export default function Component() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -455,7 +473,6 @@ export default function Component() {
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-
                 </DropdownMenu>
               </TableCell>
             </TableRow>

@@ -75,7 +75,7 @@ const fetchTeachers = async (): Promise<Teacher[]> => {
 };
 
 const fetchDepartments = async (): Promise<Department[]> => {
-  const res = await api.get("/department.list");
+  const res = await api.get("/department.getAll");
   return res.data.result.data;
 };
 

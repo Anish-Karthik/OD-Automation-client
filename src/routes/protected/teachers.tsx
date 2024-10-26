@@ -54,6 +54,7 @@ import AssignRoleForm, { type assignRoleSchema } from "./assign-role";
 // Types
 type Teacher = {
   id: string;
+  userId: string;
   name: string;
   email: string;
   role: "TUTOR" | "YEAR_IN_CHARGE" | "HOD" | null;
@@ -364,7 +365,7 @@ export default function TeacherManagement() {
                     <DropdownMenuItem onClick={() => handleEdit(teacher)}>
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(teacher.id)}>
+                    <DropdownMenuItem onClick={() => handleDelete(teacher.userId)}>
                       Delete
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleAssignRole(teacher)}>

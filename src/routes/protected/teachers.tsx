@@ -93,9 +93,16 @@ const updateTeacher = async (data: Teacher) => {
 }
 
 const deleteTeacher = async (id: string) => {
-  // Simulated API call
-  console.log('Deleting teacher:', id)
-  return id
+   
+  try {
+    const res = await api.post('/user.delete', {id})
+    console.log('deleteTeacher', res.data)
+    return res.data.result.data
+  }
+  catch (err) {
+    console.log('deleteTeacher', err)
+  }
+
 }
 
 const bulkCreateTeachers = async (data: Teacher[]) => {

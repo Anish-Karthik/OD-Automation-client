@@ -342,16 +342,13 @@ export default function Component() {
     }
   };
 
-  
-  const handleBulkUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log("File uploaded:", event.target.files?.[0]);
     const file = event.target.files?.[0];
     if (file) {
       console.log("Uploading file:", file);
       setIsUploading(true);
-
+  
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
@@ -365,11 +362,17 @@ export default function Component() {
           console.error("Error processing file:", error);
           toast({ title: "Error processing file", variant: "destructive" });
           setIsUploading(false);
+        } finally {
+          setIsUploading(false);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Clear the file input
+          }
         }
       };
       reader.readAsArrayBuffer(file);
     }
   };
+  
 
   const handleBulkUploadClick = () => {
     console.log("Bulk upload clicked");

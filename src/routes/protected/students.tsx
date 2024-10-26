@@ -56,6 +56,7 @@ import {
 import { Plus, MoreHorizontal, FileUp } from "lucide-react";
 import * as XLSX from "xlsx";
 import { api } from "@/lib/axios";
+import IncrementSemesterForm from "./increment-semester-form";
 
 type StudentForm = {
   regNo: string;
@@ -215,6 +216,9 @@ export default function Component() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isIncrementSemesterDialogOpen, setIsIncrementSemesterDialogOpen] =
+    useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const itemsPerPage = 10;
 
@@ -224,10 +228,7 @@ export default function Component() {
     queryKey: ["students"],
     queryFn: fetchStudents,
   });
-  const { data: departments = [] } = useQuery<
-    Department[],
-    Error
-  >({
+  const { data: departments = [] } = useQuery<Department[], Error>({
     queryKey: ["departments"],
     queryFn: fetchDepartments,
   });
@@ -394,35 +395,69 @@ export default function Component() {
     <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">Student Management</h1>
       <div className="flex justify-between items-center mb-6">
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              onClick={() => {
-                setEditingStudent(null);
-                form.reset();
-              }}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add Student
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>
-                {editingStudent ? "Edit Student" : "Add New Student"}
-              </DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
+        <div className="flex space-x-2">
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {
+                  setEditingStudent(null);
+                  form.reset();
+                }}
               >
-                <div className="grid grid-cols-2 gap-4">
+                <Plus className="mr-2 h-4 w-4" /> Add Student
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingStudent ? "Edit Student" : "Add New Student"}
+                </DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="regNo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Registration Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="rollno"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Roll Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              onChange={(e) =>
+                                field.onChange(Number.parseInt(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <FormField
                     control={form.control}
-                    name="regNo"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Registration Number</FormLabel>
+                        <FormLabel>Name</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -432,247 +467,234 @@ export default function Component() {
                   />
                   <FormField
                     control={form.control}
-                    name="rollno"
+                    name="batch"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Roll Number</FormLabel>
+                        <FormLabel>Batch</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select batch" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {generateYearOptions().map((year) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Year</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="1">1</SelectItem>
+                            <SelectItem value="2">2</SelectItem>
+                            <SelectItem value="3">3</SelectItem>
+                            <SelectItem value="4">4</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {field.value === "other" && (
+                          <Input
+                            type="number"
+                            placeholder="Enter year (5-6)"
+                            onChange={(e) => field.onChange(e.target.value)}
+                            min={5}
+                            max={6}
+                          />
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="semester"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Semester</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={!year}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select semester" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {year === "1" && (
+                              <>
+                                <SelectItem value="1">1</SelectItem>
+                                <SelectItem value="2">2</SelectItem>
+                              </>
+                            )}
+                            {year === "2" && (
+                              <>
+                                <SelectItem value="3">3</SelectItem>
+                                <SelectItem value="4">4</SelectItem>
+                              </>
+                            )}
+                            {year === "3" && (
+                              <>
+                                <SelectItem value="5">5</SelectItem>
+                                <SelectItem value="6">6</SelectItem>
+                              </>
+                            )}
+                            {year === "4" && (
+                              <>
+                                <SelectItem value="7">7</SelectItem>
+                                <SelectItem value="8">8</SelectItem>
+                              </>
+                            )}
+                            {(year === "5" ||
+                              year === "6" ||
+                              year === "other") && (
+                              <>
+                                <SelectItem value="1">1</SelectItem>
+                                <SelectItem value="2">2</SelectItem>
+                                <SelectItem value="3">3</SelectItem>
+                                <SelectItem value="4">4</SelectItem>
+                                <SelectItem value="5">5</SelectItem>
+                                <SelectItem value="6">6</SelectItem>
+                                <SelectItem value="7">7</SelectItem>
+                                <SelectItem value="8">8</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="section"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Section</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select section" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="A">A</SelectItem>
+                            <SelectItem value="B">B</SelectItem>
+                            <SelectItem value="C">C</SelectItem>
+                            <SelectItem value="D">D</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {field.value === "other" && (
+                          <Input
+                            placeholder="Enter section"
+                            onChange={(e) => field.onChange(e.target.value)}
+                          />
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input
+                            type="email"
                             {...field}
-                            type="number"
-                            onChange={(e) =>
-                              field.onChange(Number.parseInt(e.target.value))
-                            }
+                            value={field.value ?? ""}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="batch"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Batch</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select batch" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {generateYearOptions().map((year) => (
-                            <SelectItem key={year} value={year}>
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="year"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Year</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select year" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">1</SelectItem>
-                          <SelectItem value="2">2</SelectItem>
-                          <SelectItem value="3">3</SelectItem>
-                          <SelectItem value="4">4</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {field.value === "other" && (
-                        <Input
-                          type="number"
-                          placeholder="Enter year (5-6)"
-                          onChange={(e) => field.onChange(e.target.value)}
-                          min={5}
-                          max={6}
-                        />
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="semester"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Semester</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        disabled={!year}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select semester" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {year === "1" && (
-                            <>
-                              <SelectItem value="1">1</SelectItem>
-                              <SelectItem value="2">2</SelectItem>
-                            </>
-                          )}
-                          {year === "2" && (
-                            <>
-                              <SelectItem value="3">3</SelectItem>
-                              <SelectItem value="4">4</SelectItem>
-                            </>
-                          )}
-                          {year === "3" && (
-                            <>
-                              <SelectItem value="5">5</SelectItem>
-                              <SelectItem value="6">6</SelectItem>
-                            </>
-                          )}
-                          {year === "4" && (
-                            <>
-                              <SelectItem value="7">7</SelectItem>
-                              <SelectItem value="8">8</SelectItem>
-                            </>
-                          )}
-                          {(year === "5" ||
-                            year === "6" ||
-                            year === "other") && (
-                            <>
-                              <SelectItem value="1">1</SelectItem>
-                              <SelectItem value="2">2</SelectItem>
-                              <SelectItem value="3">3</SelectItem>
-                              <SelectItem value="4">4</SelectItem>
-                              <SelectItem value="5">5</SelectItem>
-                              <SelectItem value="6">6</SelectItem>
-                              <SelectItem value="7">7</SelectItem>
-                              <SelectItem value="8">8</SelectItem>
-                            </>
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="section"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Section</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select section" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="A">A</SelectItem>
-                          <SelectItem value="B">B</SelectItem>
-                          <SelectItem value="C">C</SelectItem>
-                          <SelectItem value="D">D</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {field.value === "other" && (
-                        <Input
-                          placeholder="Enter section"
-                          onChange={(e) => field.onChange(e.target.value)}
-                        />
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="departmentId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Department</FormLabel>
-                      {departments?.length && (
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value!}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select department" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {departments?.map((dept) => (
-                              <SelectItem key={dept.id} value={dept.id}>
-                                {dept.name} ({dept.code})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  {editingStudent ? "Update Student" : "Add Student"}
-                </Button>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+                  <FormField
+                    control={form.control}
+                    name="departmentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department</FormLabel>
+                        {departments?.length && (
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value!}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select department" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {departments?.map((dept) => (
+                                <SelectItem key={dept.id} value={dept.id}>
+                                  {dept.name} ({dept.code})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    {editingStudent ? "Update Student" : "Add Student"}
+                  </Button>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+          <Dialog
+            open={isIncrementSemesterDialogOpen}
+            onOpenChange={setIsIncrementSemesterDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button>Increment Semester</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Increment Student Semester</DialogTitle>
+              </DialogHeader>
+              <IncrementSemesterForm
+                onSuccess={() => {
+                  setIsIncrementSemesterDialogOpen(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
         <div>
           <Input
             type="file"

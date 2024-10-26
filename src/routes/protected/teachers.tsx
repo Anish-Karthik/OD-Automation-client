@@ -86,6 +86,7 @@ const createTeacher = async (data: Teacher) => {
 
 const updateTeacher = async (data: Teacher) => {
   const res = await api.post("/user.teacher.create", data);
+  
   return res.data.result.data;
 };
 

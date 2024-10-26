@@ -192,13 +192,23 @@ const deleteStudent = async (id: string) => {
 
 const bulkCreateStudents = async (data: Student[]) => {
   try {
-    const res = await api.post("/user.student.createMany", data);
+    // Convert batch values to strings
+    const formattedData = data.map((student) => ({
+      ...student,
+      batch: student.batch.toString(),
+    }));
+
+    console.log("Bulk creating students:", formattedData);
+    
+    // Send the formatted data to the API
+    const res = await api.post("/user.student.createMany", formattedData);
     return res.data.result;
   } catch (error) {
     console.error("Failed to bulk create students:", error);
     throw error;
   }
 };
+
 
 export default function Component() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -332,12 +342,16 @@ export default function Component() {
     }
   };
 
+  
   const handleBulkUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    console.log("File uploaded:", event.target.files?.[0]);
     const file = event.target.files?.[0];
     if (file) {
+      console.log("Uploading file:", file);
       setIsUploading(true);
+
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
@@ -358,6 +372,7 @@ export default function Component() {
   };
 
   const handleBulkUploadClick = () => {
+    console.log("Bulk upload clicked");
     fileInputRef.current?.click();
   };
 

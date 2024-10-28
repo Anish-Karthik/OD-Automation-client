@@ -35,7 +35,7 @@ const formSchema = z
     username: z.string().min(2).max(50),
     email: email.nullable(),
     phone: phone.nullable(),
-    password: z.string().min(6),
+    password: z.string(),
   })
   .refine(
     (data) => {

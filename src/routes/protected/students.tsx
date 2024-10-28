@@ -169,7 +169,7 @@ const createStudent = async (data: StudentForm) => {
 
 const updateStudent = async (data: StudentUpdateForm) => {
   try {
-    const res = await api.post("/user.student.update", {
+    const res = await api.post("/user.student.create", {
       ...data,
       year: Number.parseInt(data.year),
       semester: Number.parseInt(data.semester),

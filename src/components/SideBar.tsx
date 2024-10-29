@@ -1,14 +1,8 @@
 import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  LucideIcon,
-  Menu,
-  Settings,
-  User2,
-  Users
-} from "lucide-react";
+import { LayoutDashboard, LucideIcon, Menu, Settings, User2, Users } from "lucide-react";
 import React from "react";
 import { ScrollArea } from "./ui/scroll-area";
+import { Link } from "react-router-dom";
 
 interface SideBarProps {
   isOpen: boolean;
@@ -28,6 +22,7 @@ const routes: Route[] = [
   { name: "Profile", path: "/profile", icon: User2 },
   { name: "Settings", path: "/settings", icon: Settings },
 ];
+
 export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
   return (
     <aside
@@ -50,14 +45,14 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
         <ScrollArea className="h-[calc(100vh-4rem)] pb-10">
           <nav className="space-y-2 px-2">
             {routes.map((route) => (
-              <a
+              <Link
                 key={route.path}
-                href={route.path}
+                to={route.path}
                 className="flex items-center space-x-2 rounded-lg px-3 py-2 text-primary-foreground hover:bg-primary-foreground/10"
               >
                 <route.icon className="h-5 w-5" />
                 <span>{route.name}</span>
-              </a>
+              </Link>
             ))}
           </nav>
         </ScrollArea>

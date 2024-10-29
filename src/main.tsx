@@ -16,6 +16,7 @@ import Settings from "./routes/protected/settings";
 import Profile from "./routes/protected/profile";
 import Students from "./routes/protected/students";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import StudentManagement from "./routes/protected/StudentManagement";
 
 const router = createBrowserRouter([
   {

@@ -119,6 +119,9 @@ export default function LoginForm({ className, ...props }: LoginFormProps) {
       const res = await auth.post("/login", reqObj);
       if (res.status) {
         toast.success("Logged in successfully");
+
+        
+
         navigate("/dashboard");
         // window.location.href = "/dashboard";
       }

@@ -11,13 +11,13 @@ type SessionUser = {
   id: number;
   name: string;
   email: string;
-  phone: string;
 };
 
 // Type for the context value
 type AuthContextType = {
   user: SessionUser | null;
   loading: boolean;
+  loginCallback: (user: SessionUser) => void;
   clearAuthState: () => void;
 };
 
@@ -26,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   clearAuthState: () => {},
+  loginCallback: (user: SessionUser) => {},
 });
 
 // Create a provider component
@@ -55,9 +56,14 @@ const AuthProvider = ({ children }: React.HTMLAttributes<HTMLDivElement>) => {
     setLoading(false);
   };
 
+  const loginCallback = (user: SessionUser) => {
+    setCurrentUser(user);
+    setLoading(false);
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user: currentUser, loading, clearAuthState }}
+      value={{ user: currentUser, loading, clearAuthState, loginCallback }}
     >
       {children}
     </AuthContext.Provider>

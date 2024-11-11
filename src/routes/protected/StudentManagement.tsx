@@ -10,7 +10,7 @@ import { Student } from "../components/students/student"
 import { fetchStudents } from "@/lib/api/StudentApi"
 import { StudentTable } from "../components/students/StudentTable"
 import { AddEditStudentDialog } from "../components/students/AddEditStudentDialog"
-import { BulkUploadButton } from "../components/students/BulkIploadButton"
+import { BulkUploadButton } from "../components/students/BulkUploadButton"
 
 export default function StudentManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -21,7 +21,7 @@ export default function StudentManagement() {
     queryFn: fetchStudents,
   })
 
-  const { currentPage, itemsPerPage, paginatedItems, Pagination } = usePagination<Student>(students)
+  const { paginatedItems, Pagination } = usePagination<Student>(students)
 
   if (isLoading) {
     return (

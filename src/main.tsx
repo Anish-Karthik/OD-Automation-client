@@ -17,6 +17,7 @@ import Profile from "./routes/protected/profile";
 import Students from "./routes/protected/students";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import StudentManagement from "./routes/protected/StudentManagement";
+import SubjectManagement from "./routes/protected/SubjectManagement";
 
 const router = createBrowserRouter([
   {
@@ -53,12 +54,17 @@ const router = createBrowserRouter([
       },
       {
         path: "/students",
-        element: <Students />,
+        element: <StudentManagement />,
         errorElement: <ErrorPage />,
       },
       {
         path: "/Teachers",
         element: <Teachers />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/subjects",
+        element: <SubjectManagement />,
         errorElement: <ErrorPage />,
       },
       {

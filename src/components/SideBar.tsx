@@ -19,6 +19,7 @@ const routes: Route[] = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Students", path: "/students", icon: Users },
   { name: "Teachers", path: "/teachers", icon: Users },
+  {name: "Subjects", path: "/subjects", icon: Users},
   { name: "Profile", path: "/profile", icon: User2 },
   { name: "Settings", path: "/settings", icon: Settings },
 ];

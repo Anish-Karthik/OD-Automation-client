@@ -125,7 +125,9 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
                   <FormItem>
                     <FormLabel>Roll Number</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" placeholder="Enter roll number" className="w-full" />
+                      <Input {...field} type="number" placeholder="Enter roll number" className="w-full" onChange={(e) =>
+                        field.onChange(Number.parseInt(e.target.value))
+                      } />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

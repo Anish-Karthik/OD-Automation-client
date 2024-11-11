@@ -556,7 +556,27 @@ export default function Component() {
                                   <SelectItem value="2">2</SelectItem>
                                 </>
                               )}
-                              {/* Add similar logic for other years */}
+                              
+                              {year === "2" && (
+                                <>
+                                  <SelectItem value="3">3</SelectItem>
+                                  <SelectItem value="4">4</SelectItem>
+                                </>
+                              )}
+
+                              {year === "3" && (
+                                <>
+                                  <SelectItem value="5">5</SelectItem>
+                                  <SelectItem value="6">6</SelectItem>
+                                </>
+                              )}
+
+                              {year === "4" && (
+                                <>
+                                  <SelectItem value="7">7</SelectItem>
+                                  <SelectItem value="8">8</SelectItem>
+                                </>
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />

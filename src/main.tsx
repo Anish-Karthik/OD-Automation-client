@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
+import { Toaster as ShadcnToaster } from "./components/ui/toaster";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./components/AuthProvider";
 import ErrorPage from "./error-page";
@@ -14,7 +15,6 @@ import Dashboard from "./routes/protected/Dashboard";
 import Teachers from "./routes/protected/teachers";
 import Settings from "./routes/protected/settings";
 import Profile from "./routes/protected/profile";
-import Students from "./routes/protected/students";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import StudentManagement from "./routes/protected/StudentManagement";
 import SubjectManagement from "./routes/protected/SubjectManagement";
@@ -89,6 +89,7 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <RouterProvider router={router} />
         <Toaster />
+        <ShadcnToaster />
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>

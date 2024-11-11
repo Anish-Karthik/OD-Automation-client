@@ -20,6 +20,7 @@ import {
 import toast from "react-hot-toast";
 import { auth } from "@/lib/axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthProvider";
 
 const email = z.string().email();
 const phone = z
@@ -69,7 +70,7 @@ export default function LoginForm({ className, ...props }: LoginFormProps) {
     watch,
     formState: { isSubmitting },
   } = form;
-
+  const { loginCallback } = useAuth();
   const navigate = useNavigate();
 
   const username = watch("username");
@@ -119,9 +120,7 @@ export default function LoginForm({ className, ...props }: LoginFormProps) {
       const res = await auth.post("/login", reqObj);
       if (res.status) {
         toast.success("Logged in successfully");
-
-        
-
+        loginCallback(res.data.user);
         navigate("/dashboard");
         // window.location.href = "/dashboard";
       }

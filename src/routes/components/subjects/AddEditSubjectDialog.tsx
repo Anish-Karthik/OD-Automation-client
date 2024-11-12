@@ -7,10 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-
-
 import { z } from "zod"
 import { Loader2 } from "lucide-react"
 import { Subject, subjectSchema } from "./subject"
@@ -30,6 +29,7 @@ export function AddEditSubjectDialog({ isOpen, onClose, editingSubject }: AddEdi
     defaultValues: {
       subjectCode: "",
       name: "",
+      semester: "",
     },
   })
 
@@ -58,6 +58,7 @@ export function AddEditSubjectDialog({ isOpen, onClose, editingSubject }: AddEdi
 
   const onSubmit = (data: z.infer<typeof subjectSchema>) => {
     mutation.mutate(data)
+    form.reset()
   }
 
   return (
@@ -94,6 +95,34 @@ export function AddEditSubjectDialog({ isOpen, onClose, editingSubject }: AddEdi
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="semester"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Semester</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select semester" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1</SelectItem>
+                        <SelectItem value="2">2</SelectItem>
+                        <SelectItem value="3">3</SelectItem>
+                        <SelectItem value="4">4</SelectItem>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="6">6</SelectItem>
+                        <SelectItem value="7">7</SelectItem>
+                        <SelectItem value="8">8</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button
               type="submit"
               className="w-full"

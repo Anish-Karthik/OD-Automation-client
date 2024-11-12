@@ -1,39 +1,42 @@
 import React, { useRef, useState } from "react";
-import { useMutation, QueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { FileUp, Loader } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { bulkCreateResults } from "@/lib/api/ResultApi";
 
-export default function ResultManagement() {
+const ResultManagement: React.FC = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
 
   // Define the mutation to upload the PDF file
   const uploadFileMutation = useMutation({
     mutationFn: bulkCreateResults,
     onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ["results"] });
+      queryClient.invalidateQueries({ queryKey: ["results"] });
       toast({ title: "PDF uploaded successfully" });
       setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset the file input
+      }
     },
     onError: () => {
       toast({ title: "Failed to upload PDF", variant: "destructive" });
       setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset the file input on error as well
+      }
     },
   });
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log(event.target.files);
     const file = event.target.files?.[0];
-    // console.log(file);
     if (file) {
       setIsUploading(true);
       const formData = new FormData();
       formData.append("file", file);
 
-      // @ts-ignore
       uploadFileMutation.mutate(formData);
     }
   };
@@ -47,11 +50,11 @@ export default function ResultManagement() {
           accept="application/pdf"
           onChange={handleFileUpload}
           className="hidden"
-          ref={fileInputRef} 
+          ref={fileInputRef}
           id="pdf-upload"
         />
         <Button
-          onClick={() => fileInputRef.current?.click()} 
+          onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
           className="flex items-center justify-center"
         >
@@ -65,4 +68,6 @@ export default function ResultManagement() {
       </div>
     </div>
   );
-}
+};
+
+export default ResultManagement;

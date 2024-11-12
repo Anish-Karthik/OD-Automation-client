@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Plus, Loader } from "lucide-react"
 import { usePagination } from "@/hooks/UsePagination"
 import { Subject } from "../components/subjects/subject"
-import { fetchSubjects } from "@/lib/api/SubjectApi"
+import { bulkCreateSubjects, fetchSubjects } from "@/lib/api/SubjectApi"
 import { SubjectTable } from "../components/subjects/SubjectTable"
 import { AddEditSubjectDialog } from "../components/subjects/AddEditSubjectDialog"
+import { BulkUploadButton } from "../components/subjects/BulkUploadButton"
+
 
 
 export default function SubjectManagement() {
@@ -19,7 +21,7 @@ export default function SubjectManagement() {
     queryKey: ["subjects"],
     queryFn: fetchSubjects,
   })
-  console.log(subjects)
+  // console.log(subjects)
 
   const { paginatedItems, Pagination } = usePagination<Subject>(subjects)
 
@@ -45,7 +47,9 @@ export default function SubjectManagement() {
           <Plus className="h-5 w-5 mr-2" />
           Add Subject
         </Button>
+        <BulkUploadButton />
       </div>
+     
       <SubjectTable
         subjects={paginatedItems}
         onEdit={(subject) => {

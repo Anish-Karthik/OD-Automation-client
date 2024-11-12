@@ -15,3 +15,10 @@ export const auth = axios.create({
   },
   withCredentials: true,
 });
+
+
+
+export const flask = axios.create({
+  baseURL: `https://result-analysis-server-nknm.onrender.com/`, 
+  withCredentials: true,
+});

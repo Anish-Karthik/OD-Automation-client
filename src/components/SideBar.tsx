@@ -1,8 +1,18 @@
-import { Button } from "@/components/ui/button";
-import { LayoutDashboard, LucideIcon, Menu, Settings, User2, Users } from "lucide-react";
 import React from "react";
-import { ScrollArea } from "./ui/scroll-area";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  LayoutDashboard,
+  LucideIcon,
+  Menu,
+  Settings,
+  User2,
+  Users,
+  BookOpen,
+  BarChart2,
+  Upload
+} from "lucide-react";
 
 interface SideBarProps {
   isOpen: boolean;
@@ -15,16 +25,38 @@ interface Route {
   icon: LucideIcon;
 }
 
-const routes: Route[] = [
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "Students", path: "/students", icon: Users },
-  { name: "Teachers", path: "/teachers", icon: Users },
-  {name: "Subjects", path: "/subjects", icon: Users},
+interface RouteGroup {
+  name: string;
+  routes: Route[];
+}
+
+const routeGroups: RouteGroup[] = [
+  {
+    name: "OD Management",
+    routes: [
+      { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+      { name: "Students", path: "/students", icon: Users },
+      { name: "Teachers", path: "/teachers", icon: Users },
+    ],
+  },
+  {
+    name: "Result Analysis",
+    routes: [
+      { name: "Subjects", path: "/subjects", icon: BookOpen },
+      { name: "Result Upload", path: "/result-upload", icon: Upload },
+      { name: "Analysis", path: "/analysis", icon: BarChart2 },
+    ],
+  },
+];
+
+const otherRoutes: Route[] = [
   { name: "Profile", path: "/profile", icon: User2 },
   { name: "Settings", path: "/settings", icon: Settings },
 ];
 
 export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
+  const location = useLocation();
+
   return (
     <aside
       className={`bg-primary text-primary-foreground w-64 min-h-screen p-4 ${
@@ -32,7 +64,7 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
       } md:block`}
     >
       <div className="flex items-center justify-between mb-6">
-        <span className="text-2xl font-semibold">Dashboard</span>
+        <span className="text-2xl font-semibold">OD Management</span>
         <Button
           variant="ghost"
           size="icon"
@@ -42,22 +74,53 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
           <Menu className="h-6 w-6" />
         </Button>
       </div>
-      <div className="h-full bg-primary text-primary-foreground">
-        <ScrollArea className="h-[calc(100vh-4rem)] pb-10">
-          <nav className="space-y-2 px-2">
-            {routes.map((route) => (
-              <Link
-                key={route.path}
-                to={route.path}
-                className="flex items-center space-x-2 rounded-lg px-3 py-2 text-primary-foreground hover:bg-primary-foreground/10"
-              >
-                <route.icon className="h-5 w-5" />
-                <span>{route.name}</span>
-              </Link>
-            ))}
-          </nav>
-        </ScrollArea>
-      </div>
+      <ScrollArea className="h-[calc(100vh-4rem)] pb-10">
+        <nav className="space-y-6">
+          {routeGroups.map((group) => (
+            <div key={group.name}>
+              <h3 className="mb-2 px-3 text-sm font-semibold text-primary-foreground/60">
+                {group.name}
+              </h3>
+              <ul className="space-y-1">
+                {group.routes.map((route) => (
+                  <li key={route.path}>
+                    <Link
+                      to={route.path}
+                      className={`flex items-center space-x-2 rounded-lg px-3 py-2 text-sm ${
+                        location.pathname === route.path
+                          ? "bg-primary-foreground/10 font-medium"
+                          : "text-primary-foreground hover:bg-primary-foreground/10"
+                      }`}
+                    >
+                      <route.icon className="h-4 w-4" />
+                      <span>{route.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          <div>
+            <ul className="space-y-1">
+              {otherRoutes.map((route) => (
+                <li key={route.path}>
+                  <Link
+                    to={route.path}
+                    className={`flex items-center space-x-2 rounded-lg px-3 py-2 text-sm ${
+                      location.pathname === route.path
+                        ? "bg-primary-foreground/10 font-medium"
+                        : "text-primary-foreground hover:bg-primary-foreground/10"
+                    }`}
+                  >
+                    <route.icon className="h-4 w-4" />
+                    <span>{route.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+      </ScrollArea>
     </aside>
   );
 };

@@ -22,6 +22,23 @@ export const updateSubject = async (data: Subject): Promise<Subject> => {
  
 }
 
+export const bulkCreateSubjects = async (data: Subject[]): Promise<Subject[]> => {
+  try {
+
+    const formattedData = data.map((subject) => ({
+      ...subject,
+      semester: subject.semester.toString(),
+    }));
+
+    const res = await api.post("/subject.createMany", formattedData);
+
+    return res.data.result;
+  } catch (error) {
+    console.error("Failed to bulk create subjects:", error);
+    throw error;
+  }
+}
+
 export const deleteSubject = async (id: string): Promise<void> => {
   await api.post("/subject.delete", { id })
  

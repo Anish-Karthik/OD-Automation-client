@@ -40,6 +40,7 @@ export function SubjectTable({ subjects, onEdit }: SubjectTableProps) {
         <TableRow>
           <TableHead>Subject Code</TableHead>
           <TableHead>Name</TableHead>
+          <TableHead>Semester</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -48,6 +49,7 @@ export function SubjectTable({ subjects, onEdit }: SubjectTableProps) {
           <TableRow key={subject.id}>
             <TableCell>{subject.subjectCode}</TableCell>
             <TableCell>{subject.name}</TableCell>
+            <TableCell>{subject.semester}</TableCell>
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

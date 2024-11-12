@@ -50,8 +50,8 @@ const routeGroups: RouteGroup[] = [
 ];
 
 const otherRoutes: Route[] = [
-  { name: "Profile", path: "/profile", icon: User2 },
-  { name: "Settings", path: "/settings", icon: Settings },
+  // { name: "Profile", path: "/profile", icon: User2 },
+  // { name: "Settings", path: "/settings", icon: Settings },
 ];
 
 export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {

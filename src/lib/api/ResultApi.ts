@@ -7,8 +7,10 @@ export const bulkCreateResults = async (formData: FormData): Promise<any> => {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      withCredentials: true, // Include credentials in the request
     });
-    console.log(res);
+    console.log("Response:", res.data); // Access response data consistently
+    return res.data;
   } catch (error) {
     console.error("Failed to bulk create results:", error);
     throw error;

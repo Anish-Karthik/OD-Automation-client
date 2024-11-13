@@ -94,27 +94,49 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
     return Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString())
   }
 
+  const getSemesterOptions = (year: string): Array<"1" | "2" | "3" | "4" | "5" | "6" | "7" | "8"> => {
+    switch (year) {
+      case "1":
+        return ["1", "2"];
+      case "2":
+        return ["3", "4"];
+      case "3":
+        return ["5", "6"];
+      case "4":
+        return ["7", "8"];
+      default:
+        return ["1"];
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px]">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center mb-4">
+      <DialogContent className="bg-gray-800 text-white border border-gray-700 shadow-lg max-w-2xl">
+        <DialogHeader className="border-b border-gray-700 pb-4">
+          <DialogTitle className="text-2xl font-bold text-yellow-400">
             {editingStudent ? "Edit Student" : "Add New Student"}
           </DialogTitle>
+          <p className="text-gray-400 text-sm">
+            {editingStudent ? "Update student information" : "Enter student details to create a new record"}
+          </p>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-2">
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="regNo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Registration Number</FormLabel>
+                    <FormLabel className="text-gray-200">Registration Number</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter registration number" className="w-full" />
+                      <Input 
+                        {...field} 
+                        placeholder="Enter registration number" 
+                        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -123,13 +145,19 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
                 name="rollno"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Roll Number</FormLabel>
+                    <FormLabel className="text-gray-200">Roll Number</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" placeholder="Enter roll number" className="w-full" onChange={(e) =>
-                        field.onChange(Number.parseInt(e.target.value))
-                      } />
+                      <Input 
+                        {...field} 
+                        type="number" 
+                        placeholder="Enter roll number" 
+                        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                        onChange={(e) =>
+                          field.onChange(Number.parseInt(e.target.value))
+                        }
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -139,11 +167,15 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-gray-200">Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter student name" className="w-full" />
+                    <Input 
+                      {...field} 
+                      placeholder="Enter student name" 
+                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
@@ -153,22 +185,26 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
                 name="batch"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Batch</FormLabel>
+                    <FormLabel className="text-gray-200">Batch</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select batch" />
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                          <SelectValue placeholder="Select batch" className="text-gray-400" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-gray-800 border-gray-700">
                         {generateYearOptions().map((year) => (
-                          <SelectItem key={year} value={year}>
+                          <SelectItem 
+                            key={year} 
+                            value={year}
+                            className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                          >
                             {year}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -177,32 +213,33 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
                 name="year"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Year</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <FormLabel className="text-gray-200">Year</FormLabel>
+                    <Select 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        const semesterOptions = getSemesterOptions(value);
+                        form.setValue("semester", semesterOptions[0]);
+                      }} 
+                      value={field.value}
+                    >
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select year" />
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                          <SelectValue placeholder="Select year" className="text-gray-400" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="1">1</SelectItem>
-                        <SelectItem value="2">2</SelectItem>
-                        <SelectItem value="3">3</SelectItem>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                      <SelectContent className="bg-gray-800 border-gray-700">
+                        {["1", "2", "3", "4"].map((year) => (
+                          <SelectItem 
+                            key={year} 
+                            value={year}
+                            className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                          >
+                            {year}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    {field.value === "other" && (
-                      <Input
-                        type="number"
-                        placeholder="Enter year (5-6)"
-                        onChange={(e) => field.onChange(e.target.value)}
-                        min={5}
-                        max={6}
-                        className="mt-2"
-                      />
-                    )}
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -213,22 +250,33 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
                 name="semester"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Semester</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <FormLabel className="text-gray-200">Semester</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      value={field.value}
+                      disabled={!form.watch("year")}
+                    >
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select semester" />
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                          <SelectValue 
+                            placeholder={form.watch("year") ? "Select semester" : "Select year first"} 
+                            className="text-gray-400" 
+                          />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        {["1", "2", "3", "4", "5", "6", "7", "8"].map((semester) => (
-                          <SelectItem key={semester} value={semester}>
+                      <SelectContent className="bg-gray-800 border-gray-700">
+                        {getSemesterOptions(form.watch("year")).map((semester) => (
+                          <SelectItem 
+                            key={semester} 
+                            value={semester}
+                            className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                          >
                             {semester}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -237,16 +285,20 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
                 name="section"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Section</FormLabel>
+                    <FormLabel className="text-gray-200">Section</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select section" />
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                          <SelectValue placeholder="Select section" className="text-gray-400" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-gray-800 border-gray-700">
                         {["A", "B", "C", "D", "Other"].map((section) => (
-                          <SelectItem key={section} value={section}>
+                          <SelectItem 
+                            key={section} 
+                            value={section}
+                            className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                          >
                             {section}
                           </SelectItem>
                         ))}
@@ -256,10 +308,10 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
                       <Input
                         placeholder="Enter custom section"
                         onChange={(e) => field.onChange(e.target.value)}
-                        className="mt-2"
+                        className="mt-2 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
                       />
                     )}
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -269,17 +321,17 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-gray-200">Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       {...field}
                       value={field.value ?? ""}
                       placeholder="Enter email"
-                      className="w-full"
+                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
@@ -288,35 +340,49 @@ export function AddEditStudentDialog({ isOpen, onClose, editingStudent }: AddEdi
               name="departmentId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Department</FormLabel>
+                  <FormLabel className="text-gray-200">Department</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select department" />
+                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                        <SelectValue placeholder="Select department" className="text-gray-400" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-800 border-gray-700">
                       {departments.map((dept) => (
-                        <SelectItem key={dept.id} value={dept.id}>
+                        <SelectItem 
+                          key={dept.id} 
+                          value={dept.id}
+                          className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                        >
                           {dept.name} ({dept.code})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {(createMutation.isPending || updateMutation.isPending) ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              {editingStudent ? "Update Student" : "Add Student"}
-            </Button>
+            <div className="flex justify-end space-x-4 pt-4 mt-2 border-t border-gray-700">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-yellow-400"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {(createMutation.isPending || updateMutation.isPending) ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {editingStudent ? "Update Student" : "Add Student"}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

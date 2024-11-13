@@ -27,28 +27,10 @@ export default function HomePageLayout() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:block">
-        <SideBar isOpen={true} onClose={() => {}} />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-64">
-          <SideBar
-            isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
-          />
-        </SheetContent>
-      </Sheet>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* <TopBar onMenuClick={toggleSidebar} /> */}
-
-        {/* Page Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <div className="flex">
+        <SideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <main className="flex-1 min-h-screen">
           <Outlet />
         </main>
       </div>

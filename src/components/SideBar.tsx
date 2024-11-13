@@ -59,16 +59,16 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
 
   return (
     <aside
-      className={`bg-primary text-primary-foreground w-64 min-h-screen p-4 ${
+      className={`bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 min-h-screen p-4 ${
         isOpen ? "block" : "hidden"
       } md:block`}
     >
       <div className="flex items-center justify-between mb-6">
-        <span className="text-2xl font-semibold">OD Management</span>
+        <span className="text-2xl font-semibold text-yellow-400">OD Management</span>
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="md:hidden text-white hover:text-yellow-400"
           onClick={onClose}
         >
           <Menu className="h-6 w-6" />
@@ -78,7 +78,7 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
         <nav className="space-y-6">
           {routeGroups.map((group) => (
             <div key={group.name}>
-              <h3 className="mb-2 px-3 text-sm font-semibold text-primary-foreground/60">
+              <h3 className="mb-2 px-3 text-sm font-semibold text-gray-300">
                 {group.name}
               </h3>
               <ul className="space-y-1">
@@ -88,8 +88,8 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
                       to={route.path}
                       className={`flex items-center space-x-2 rounded-lg px-3 py-2 text-sm ${
                         location.pathname === route.path
-                          ? "bg-primary-foreground/10 font-medium"
-                          : "text-primary-foreground hover:bg-primary-foreground/10"
+                          ? "bg-gray-700 text-yellow-400 font-medium"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
                       }`}
                     >
                       <route.icon className="h-4 w-4" />
@@ -108,8 +108,8 @@ export const SideBar: React.FC<SideBarProps> = ({ isOpen, onClose }) => {
                     to={route.path}
                     className={`flex items-center space-x-2 rounded-lg px-3 py-2 text-sm ${
                       location.pathname === route.path
-                        ? "bg-primary-foreground/10 font-medium"
-                        : "text-primary-foreground hover:bg-primary-foreground/10"
+                        ? "bg-gray-700 text-yellow-400 font-medium"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
                     }`}
                   >
                     <route.icon className="h-4 w-4" />

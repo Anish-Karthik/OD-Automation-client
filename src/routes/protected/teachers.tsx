@@ -46,7 +46,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Plus, MoreHorizontal, FileUp } from "lucide-react";
+import { Plus, MoreHorizontal, FileUp, Loader } from "lucide-react";
 import * as XLSX from "xlsx";
 import { api } from "@/lib/axios";
 import AssignRoleForm, { type assignRoleSchema } from "./assign-role";
@@ -291,184 +291,191 @@ export default function TeacherManagement() {
   const totalPages = Math.ceil(teachers.length / itemsPerPage);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+        <Loader className="animate-spin h-10 w-10 mb-4 text-yellow-400" />
+        <p className="text-lg font-medium">Loading teachers</p>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">Teacher Management</h1>
-      <div className="flex justify-between items-center mb-6">
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <div className="container mx-auto py-10 text-white">
+        <h1 className="text-2xl font-bold mb-6 text-yellow-400">Teacher Management</h1>
+        <div className="flex justify-between items-center mb-6">
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {
+                  setEditingTeacher(null);
+                  form.reset();
+                }}
+                className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Teacher
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-gray-800 text-white border border-gray-700">
+              <DialogHeader>
+                <DialogTitle className="text-yellow-400">
+                  {editingTeacher ? "Edit Teacher" : "Add New Teacher"}
+                </DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-gray-700 border-gray-600 text-white placeholder-gray-400" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} className="bg-gray-700 border-gray-600 text-white placeholder-gray-400" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button 
+                    type="submit"
+                    className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300"
+                  >
+                    {editingTeacher ? "Update Teacher" : "Add Teacher"}
+                  </Button>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+          <div>
+            <Input
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleBulkUpload}
+              className="hidden"
+              id="bulk-upload"
+              disabled={isUploading}
+              ref={fileInputRef}
+            />
             <Button
-              onClick={() => {
-                setEditingTeacher(null);
-                form.reset();
-              }}
+              type="button"
+              onClick={handleBulkUploadClick}
+              disabled={isUploading}
+              className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300"
             >
-              <Plus className="mr-2 h-4 w-4" /> Add Teacher
+              <FileUp className="mr-2 h-4 w-4" />
+              {isUploading ? "Uploading..." : "Bulk Upload"}
             </Button>
-          </DialogTrigger>
-          <DialogContent>
+          </div>
+        </div>
+        <div className="bg-gray-800 rounded-lg border border-gray-700">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-gray-700 border-gray-700">
+                <TableHead className="text-gray-300">Name</TableHead>
+                <TableHead className="text-gray-300">Email</TableHead>
+                <TableHead className="text-gray-300">Role</TableHead>
+                <TableHead className="text-gray-300">Assigned To</TableHead>
+                <TableHead className="text-gray-300">Students Count</TableHead>
+                <TableHead className="text-gray-300">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedTeachers.map((teacher) => (
+                <TableRow key={teacher.id} className="hover:bg-gray-700 border-gray-700">
+                  <TableCell className="text-gray-300">{teacher.name}</TableCell>
+                  <TableCell className="text-gray-300">{teacher.email}</TableCell>
+                  <TableCell className="text-gray-300">{teacher.role || "Not Assigned"}</TableCell>
+                  <TableCell className="text-gray-300">{teacher.assignedTo || "N/A"}</TableCell>
+                  <TableCell className="text-gray-300">{teacher.countOfStudents || 0}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 text-gray-300 hover:text-yellow-400">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-gray-800 text-gray-300 border-gray-700">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleEdit(teacher)} className="hover:text-yellow-400">
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDelete(teacher.userId)} className="hover:text-yellow-400">
+                          Delete
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAssignRole(teacher)} className="hover:text-yellow-400">
+                          Assign Role
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <Pagination className="mt-4">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                className={`text-gray-300 hover:text-yellow-400 ${
+                  currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
+                }`}
+              />
+            </PaginationItem>
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(i + 1)}
+                  isActive={currentPage === i + 1}
+                  className={currentPage === i + 1 ? "bg-yellow-400 text-gray-900" : "text-gray-300 hover:text-yellow-400"}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                className={`text-gray-300 hover:text-yellow-400 ${
+                  currentPage === totalPages ? "cursor-not-allowed opacity-50" : ""
+                }`}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+
+        <Dialog open={isAssignRoleDialogOpen} onOpenChange={setIsAssignRoleDialogOpen}>
+          <DialogContent className="bg-gray-800 text-white border border-gray-700">
             <DialogHeader>
-              <DialogTitle>
-                {editingTeacher ? "Edit Teacher" : "Add New Teacher"}
+              <DialogTitle className="text-yellow-400">
+                Assign Role to {selectedTeacher?.name}
               </DialogTitle>
             </DialogHeader>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit">
-                  {editingTeacher ? "Update Teacher" : "Add Teacher"}
-                </Button>
-              </form>
-            </Form>
+            {selectedTeacher && (
+              <AssignRoleForm
+                teacher={selectedTeacher}
+                departments={departments}
+                onSubmit={onAssignRoleSubmit}
+              />
+            )}
           </DialogContent>
         </Dialog>
-        <div>
-          <Input
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={handleBulkUpload}
-            className="hidden"
-            id="bulk-upload"
-            disabled={isUploading}
-            ref={fileInputRef}
-          />
-          <Button
-            type="button"
-            onClick={handleBulkUploadClick}
-            disabled={isUploading}
-          >
-            <FileUp className="mr-2 h-4 w-4" />
-            {isUploading ? "Uploading..." : "Bulk Upload"}
-          </Button>
-        </div>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Assigned To</TableHead>
-            <TableHead>Students Count</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedTeachers.map((teacher) => (
-            <TableRow key={teacher.id}>
-              <TableCell>{teacher.name}</TableCell>
-              <TableCell>{teacher.email}</TableCell>
-              <TableCell>{teacher.role || "Not Assigned"}</TableCell>
-              <TableCell>{teacher.assignedTo || "N/A"}</TableCell>
-              <TableCell>{teacher.countOfStudents || 0}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => handleEdit(teacher)}>
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDelete(teacher.userId)}>
-                      Delete
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleAssignRole(teacher)}>
-                      Assign Role
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <Pagination className="mt-4">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className={
-                currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
-              }
-            />
-          </PaginationItem>
-          {[...Array(totalPages)].map((_, i) => (
-            <PaginationItem key={i}>
-              <PaginationLink
-                onClick={() => setCurrentPage(i + 1)}
-                isActive={currentPage === i + 1}
-              >
-                {i + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              className={
-                currentPage === totalPages
-                  ? "cursor-not-allowed opacity-50"
-                  : ""
-              }
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-
-      <Dialog
-        open={isAssignRoleDialogOpen}
-        onOpenChange={setIsAssignRoleDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Assign Role to {selectedTeacher?.name}</DialogTitle>
-          </DialogHeader>
-          {selectedTeacher && (
-            <AssignRoleForm
-              teacher={selectedTeacher}
-              departments={departments}
-              onSubmit={onAssignRoleSubmit}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

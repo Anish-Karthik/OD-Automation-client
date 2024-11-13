@@ -9,7 +9,11 @@ import * as XLSX from "xlsx"
 import { bulkCreateStudents } from "@/lib/api/StudentApi"
 import { Student } from "./student"
 
-export function BulkUploadButton() {
+interface BulkUploadButtonProps {
+  className?: string;
+}
+
+export const BulkUploadButton: React.FC<BulkUploadButtonProps> = ({ className }) => {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
@@ -47,7 +51,7 @@ export function BulkUploadButton() {
         } finally {
           setIsUploading(false)
           if (fileInputRef.current) {
-            fileInputRef.current.value = ""
+            fileInputRef.current.value = "" // Clear the file input
           }
         }
       }
@@ -63,13 +67,17 @@ export function BulkUploadButton() {
         onChange={handleBulkUpload}
         className="hidden"
         ref={fileInputRef}
-        disabled={isUploading}
       />
-    <Button onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="flex items-center justify-center">
-        {isUploading && (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-800" />
+      <Button
+        onClick={() => fileInputRef.current?.click()}
+        disabled={isUploading}
+        className={className}
+      >
+        {isUploading ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <FileUp className="mr-2 h-4 w-4" />
         )}
-        <FileUp className="mr-2 h-4 w-4" />
         {isUploading ? "Uploading..." : "Bulk Upload"}
       </Button>
     </>

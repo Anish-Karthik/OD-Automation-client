@@ -35,30 +35,30 @@ export function StudentTable({ students, onEdit }: StudentTableProps) {
 
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Reg No</TableHead>
-          <TableHead>Roll No</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Year</TableHead>
-          <TableHead>Section</TableHead>
-          <TableHead>Semester</TableHead>
-          <TableHead>Batch</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Actions</TableHead>
+      <TableHeader className="bg-gray-800">
+        <TableRow className="hover:bg-gray-700 border-gray-700">
+          <TableHead className="text-gray-300">Reg No</TableHead>
+          <TableHead className="text-gray-300">Roll No</TableHead>
+          <TableHead className="text-gray-300">Name</TableHead>
+          <TableHead className="text-gray-300">Year</TableHead>
+          <TableHead className="text-gray-300">Section</TableHead>
+          <TableHead className="text-gray-300">Semester</TableHead>
+          <TableHead className="text-gray-300">Batch</TableHead>
+          <TableHead className="text-gray-300">Email</TableHead>
+          <TableHead className="text-gray-300">Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="bg-gray-800">
         {students.map((student) => (
-          <TableRow key={student.id}>
-            <TableCell>{student.regNo}</TableCell>
-            <TableCell>{student.rollno}</TableCell>
-            <TableCell>{student.name}</TableCell>
-            <TableCell>{student.year}</TableCell>
-            <TableCell>{student.section}</TableCell>
-            <TableCell>{student.semester}</TableCell>
-            <TableCell>{student.batch}</TableCell>
-            <TableCell>{student.email}</TableCell>
+          <TableRow key={student.id} className="hover:bg-gray-700 border-gray-700">
+            <TableCell className="text-gray-300">{student.regNo}</TableCell>
+            <TableCell className="text-gray-300">{student.rollno}</TableCell>
+            <TableCell className="text-gray-300">{student.name}</TableCell>
+            <TableCell className="text-gray-300">{student.year}</TableCell>
+            <TableCell className="text-gray-300">{student.section}</TableCell>
+            <TableCell className="text-gray-300">{student.semester}</TableCell>
+            <TableCell className="text-gray-300">{student.batch}</TableCell>
+            <TableCell className="text-gray-300">{student.email}</TableCell>
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

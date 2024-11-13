@@ -39,29 +39,34 @@ export default function ResultManagement() {
   };
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">Result Management</h1>
-      <div className="flex justify-between items-center mb-6">
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={handleFileUpload}
-          className="hidden"
-          ref={fileInputRef} 
-          id="pdf-upload"
-        />
-        <Button
-          onClick={() => fileInputRef.current?.click()} 
-          disabled={isUploading}
-          className="flex items-center justify-center"
-        >
-          {isUploading ? (
-            <Loader className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <FileUp className="mr-2 h-4 w-4" />
-          )}
-          {isUploading ? "Uploading..." : "Upload PDF"}
-        </Button>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <div className="container mx-auto py-10 text-white">
+        <h1 className="text-2xl font-bold mb-6 text-yellow-400">Result Management</h1>
+        <div className="flex justify-between items-center mb-6">
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleFileUpload}
+            className="hidden"
+            ref={fileInputRef} 
+            id="pdf-upload"
+          />
+          <Button
+            onClick={() => fileInputRef.current?.click()} 
+            disabled={isUploading}
+            className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300 flex items-center justify-center"
+          >
+            {isUploading ? (
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <FileUp className="mr-2 h-4 w-4" />
+            )}
+            {isUploading ? "Uploading..." : "Upload PDF"}
+          </Button>
+        </div>
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-4">
+          {/* Content area for uploaded results */}
+        </div>
       </div>
     </div>
   );

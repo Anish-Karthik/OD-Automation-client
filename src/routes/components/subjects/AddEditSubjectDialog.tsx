@@ -63,22 +63,31 @@ export function AddEditSubjectDialog({ isOpen, onClose, editingSubject }: AddEdi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{editingSubject ? "Edit Subject" : "Add New Subject"}</DialogTitle>
+      <DialogContent className="bg-gray-800 text-white border border-gray-700 shadow-lg max-w-2xl">
+        <DialogHeader className="border-b border-gray-700 pb-4">
+          <DialogTitle className="text-2xl font-bold text-yellow-400">
+            {editingSubject ? "Edit Subject" : "Add New Subject"}
+          </DialogTitle>
+          <p className="text-gray-400 text-sm">
+            {editingSubject ? "Update subject information" : "Enter subject details to create a new record"}
+          </p>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
             <FormField
               control={form.control}
               name="subjectCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Subject Code</FormLabel>
+                  <FormLabel className="text-gray-200">Subject Code</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter subject code" />
+                    <Input 
+                      {...field} 
+                      placeholder="Enter subject code" 
+                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
@@ -87,11 +96,15 @@ export function AddEditSubjectDialog({ isOpen, onClose, editingSubject }: AddEdi
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-gray-200">Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Enter subject name" />
+                    <Input 
+                      {...field} 
+                      placeholder="Enter subject name" 
+                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
@@ -100,39 +113,50 @@ export function AddEditSubjectDialog({ isOpen, onClose, editingSubject }: AddEdi
               name="semester"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Semester</FormLabel>
+                  <FormLabel className="text-gray-200">Semester</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select semester" />
+                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                        <SelectValue placeholder="Select semester" className="text-gray-400" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1</SelectItem>
-                        <SelectItem value="2">2</SelectItem>
-                        <SelectItem value="3">3</SelectItem>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="5">5</SelectItem>
-                        <SelectItem value="6">6</SelectItem>
-                        <SelectItem value="7">7</SelectItem>
-                        <SelectItem value="8">8</SelectItem>
+                      <SelectContent className="bg-gray-800 border-gray-700">
+                        {["1", "2", "3", "4", "5", "6", "7", "8"].map((semester) => (
+                          <SelectItem 
+                            key={semester} 
+                            value={semester}
+                            className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                          >
+                            {semester}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={mutation.isPending}
-            >
-              {mutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              {editingSubject ? "Update Subject" : "Add Subject"}
-            </Button>
+            <div className="flex justify-end space-x-4 pt-4 border-t border-gray-700">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300"
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {editingSubject ? "Update Subject" : "Add Subject"}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

@@ -27,42 +27,45 @@ export default function SubjectManagement() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-600">
-        <Loader className="animate-spin h-10 w-10 mb-4 text-blue-500" />
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+        <Loader className="animate-spin h-10 w-10 mb-4 text-yellow-400" />
         <p className="text-lg font-medium">Loading subjects</p>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">Subject Management</h1>
-      <div className="flex justify-between items-center mb-6">
-        <Button
-          onClick={() => {
-            setEditingSubject(null)
-            setIsAddDialogOpen(true)
-          }}
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Add Subject
-        </Button>
-        <BulkUploadButton />
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <div className="container mx-auto py-10 text-white">
+        <h1 className="text-2xl font-bold mb-6 text-yellow-400">Subject Management</h1>
+        <div className="flex justify-between items-center mb-6">
+          <Button
+            onClick={() => {
+              setEditingSubject(null)
+              setIsAddDialogOpen(true)
+            }}
+            className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Add Subject
+          </Button>
+        </div>
+        <div className="bg-gray-800 rounded-lg border border-gray-700 mb-6">
+          <SubjectTable
+            subjects={paginatedItems}
+            onEdit={(subject) => {
+              setEditingSubject(subject)
+              setIsAddDialogOpen(true)
+            }}
+          />
+        </div>
+        <Pagination />
+        <AddEditSubjectDialog
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          editingSubject={editingSubject}
+        />
       </div>
-     
-      <SubjectTable
-        subjects={paginatedItems}
-        onEdit={(subject) => {
-          setEditingSubject(subject)
-          setIsAddDialogOpen(true)
-        }}
-      />
-      <Pagination />
-      <AddEditSubjectDialog
-        isOpen={isAddDialogOpen}
-        onClose={() => setIsAddDialogOpen(false)}
-        editingSubject={editingSubject}
-      />
     </div>
   )
 }

@@ -36,20 +36,20 @@ export function SubjectTable({ subjects, onEdit }: SubjectTableProps) {
 
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Subject Code</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Semester</TableHead>
-          <TableHead>Actions</TableHead>
+      <TableHeader className="bg-gray-800">
+        <TableRow className="hover:bg-gray-700 border-gray-700">
+          <TableHead className="text-gray-300">Code</TableHead>
+          <TableHead className="text-gray-300">Name</TableHead>
+          <TableHead className="text-gray-300">Semester</TableHead>
+          <TableHead className="text-gray-300">Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="bg-gray-800">
         {subjects.map((subject) => (
-          <TableRow key={subject.id}>
-            <TableCell>{subject.subjectCode}</TableCell>
-            <TableCell>{subject.name}</TableCell>
-            <TableCell>{subject.semester}</TableCell>
+          <TableRow key={subject.id} className="hover:bg-gray-700 border-gray-700">
+            <TableCell className="text-gray-300">{subject.subjectCode}</TableCell>
+            <TableCell className="text-gray-300">{subject.name}</TableCell>
+            <TableCell className="text-gray-300">{subject.semester}</TableCell>
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

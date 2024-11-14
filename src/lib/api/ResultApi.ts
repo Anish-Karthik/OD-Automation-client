@@ -1,5 +1,11 @@
-import { Result } from "@/routes/components/results/result";
+import { ResultTable } from "@/routes/components/results/result";
 import { api, flask } from "../axios";
+
+interface ApiResponse {
+  result: {
+    data: ResultTable[]
+  }
+}
 
 export const bulkCreateResults = async (formData: FormData): Promise<any> => {
   try {
@@ -7,12 +13,21 @@ export const bulkCreateResults = async (formData: FormData): Promise<any> => {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      withCredentials: true, // Include credentials in the request
+      withCredentials: true,
     });
-    console.log("Response:", res.data); // Access response data consistently
     return res.data;
   } catch (error) {
     console.error("Failed to bulk create results:", error);
+    throw error;
+  }
+};
+
+export const getSemesterUploads = async (): Promise<ApiResponse> => {
+  try {
+    const res = await api.get("/result.getSemesterUploads");
+    return res.data;
+  } catch (error) {
+    console.error("Failed to get semester uploads:", error);
     throw error;
   }
 };

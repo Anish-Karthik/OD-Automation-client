@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { FileUp, Loader } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { bulkCreateResults } from "@/lib/api/ResultApi";
+import { ResultTable } from "../components/results/ResultTable";
+
 
 export default function ResultManagement() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -65,9 +67,10 @@ export default function ResultManagement() {
           </Button>
         </div>
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-4">
-          {/* Content area for uploaded results */}
+         <ResultTable />
         </div>
       </div>
+    
     </div>
   );
 }

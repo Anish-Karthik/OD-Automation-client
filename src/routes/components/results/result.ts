@@ -1,4 +1,4 @@
-import * as z from "zod"
+
 
 export type Result = {
   id: string
@@ -6,7 +6,7 @@ export type Result = {
   subjectCode: string
   grade: string
 }
-
-
-
-
+export type ResultTable = {
+  batchYear: string;
+  semester: string;
+}

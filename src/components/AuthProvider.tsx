@@ -26,7 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   clearAuthState: () => {},
-  loginCallback: (user: SessionUser) => {},
+  loginCallback: () => {},
 });
 
 // Create a provider component

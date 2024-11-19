@@ -56,7 +56,7 @@ import {
 import { Plus, MoreHorizontal, FileUp } from "lucide-react";
 import * as XLSX from "xlsx";
 import { api } from "@/lib/axios";
-import IncrementSemesterForm from "./increment-semester-form";
+
 
 type StudentForm = {
   regNo: string;
@@ -216,8 +216,8 @@ export default function Component() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [isIncrementSemesterDialogOpen, setIsIncrementSemesterDialogOpen] =
-    useState(false);
+  // const [isIncrementSemesterDialogOpen, setIsIncrementSemesterDialogOpen] =
+  //   useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const itemsPerPage = 10;

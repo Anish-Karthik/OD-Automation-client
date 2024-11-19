@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Plus, Loader } from "lucide-react"
 import { usePagination } from "@/hooks/UsePagination"
 import { Subject } from "../components/subjects/subject"
-import { bulkCreateSubjects, fetchSubjects } from "@/lib/api/SubjectApi"
+import { fetchSubjects } from "@/lib/api/SubjectApi"
 import { SubjectTable } from "../components/subjects/SubjectTable"
 import { AddEditSubjectDialog } from "../components/subjects/AddEditSubjectDialog"
-import { BulkUploadButton } from "../components/subjects/BulkUploadButton"
+
 
 
 

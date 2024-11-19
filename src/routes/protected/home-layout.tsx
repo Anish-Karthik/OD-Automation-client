@@ -1,7 +1,6 @@
 import { useAuth } from "@/components/AuthProvider";
 import { SideBar } from "@/components/SideBar";
-import { TopBar } from "@/components/TopBar";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+
 import { Loader } from "lucide-react";
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -24,7 +23,6 @@ export default function HomePageLayout() {
     navigate("/auth/login");
     // return null;
   }
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">

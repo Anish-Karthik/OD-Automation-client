@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useMutation, QueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { FileUp, Loader } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -10,7 +10,6 @@ import { ResultTable } from "../components/results/ResultTable";
 export default function ResultManagement() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const queryClient = new QueryClient();
 
   // Define the mutation to upload the PDF file
   const uploadFileMutation = useMutation({

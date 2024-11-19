@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Bell, User, Search, Menu } from "lucide-react";
+
+import { Bell, User,  Menu } from "lucide-react";
 
 interface TopBarProps {
   onMenuClick: () => void;

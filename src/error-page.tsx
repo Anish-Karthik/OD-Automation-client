@@ -1,5 +1,5 @@
-import { useRouteError, Link } from 'react-router-dom'
-import { Home, RefreshCcw } from 'lucide-react'
+import { useRouteError} from 'react-router-dom'
+
 
 export default function ErrorPage() {
   const error: any = useRouteError()

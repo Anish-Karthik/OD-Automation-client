@@ -6,8 +6,6 @@ import {
   LayoutDashboard,
   LucideIcon,
   Menu,
-  Settings,
-  User2,
   Users,
   BookOpen,
   BarChart2,

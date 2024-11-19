@@ -1,9 +1,8 @@
 'use client'
 
 import * as React from "react"
-import { Helmet } from "react-helmet"
 import { Link, useNavigate } from "react-router-dom"
-import { ArrowRight, FileText } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -22,7 +21,6 @@ import {
 import { Icons } from "@/components/ui/icons"
 import { auth } from "@/lib/axios"
 import { useAuth } from "@/components/AuthProvider"
-import classImage from './class.jpg'
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -45,7 +43,7 @@ export default function LoginPage() {
   const { loginCallback } = useAuth()
   const navigate = useNavigate()
 
-  const { watch, setValue, formState: { isSubmitting } } = form
+  const { watch, formState: { isSubmitting } } = form
 
   const username = watch("username")
 

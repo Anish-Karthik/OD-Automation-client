@@ -136,26 +136,26 @@ export default function AssignRoleForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-2">
         <FormField
           control={form.control}
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Role</FormLabel>
+              <FormLabel className="text-gray-200">Role</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                    <SelectValue placeholder="Select a role" className="text-gray-400" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="TUTOR">Tutor</SelectItem>
-                  <SelectItem value="YEAR_IN_CHARGE">Year In Charge</SelectItem>
-                  <SelectItem value="HOD">HOD</SelectItem>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="TUTOR" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">Tutor</SelectItem>
+                  <SelectItem value="YEAR_IN_CHARGE" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">Year In Charge</SelectItem>
+                  <SelectItem value="HOD" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">HOD</SelectItem>
                 </SelectContent>
               </Select>
-              <FormMessage />
+              <FormMessage className="text-red-400" />
             </FormItem>
           )}
         />
@@ -165,49 +165,57 @@ export default function AssignRoleForm({
           name="departmentId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Department</FormLabel>
+              <FormLabel className="text-gray-200">Department</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a department" />
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                    <SelectValue placeholder="Select a department" className="text-gray-400" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 border-gray-700">
                   {departments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.id}>
+                    <SelectItem 
+                      key={dept.id} 
+                      value={dept.id}
+                      className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                    >
                       {dept.name} ({dept.code})
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
+              <FormMessage className="text-red-400" />
             </FormItem>
           )}
         />
 
         {(role === "TUTOR" || role === "YEAR_IN_CHARGE") && (
-          <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="batch"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Batch</FormLabel>
+                  <FormLabel className="text-gray-200">Batch</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a batch" />
+                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                        <SelectValue placeholder="Select a batch" className="text-gray-400" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-800 border-gray-700">
                       {generateYearOptions().map((year) => (
-                        <SelectItem key={year} value={year}>
+                        <SelectItem 
+                          key={year} 
+                          value={year}
+                          className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400"
+                        >
                           {year}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
@@ -217,7 +225,7 @@ export default function AssignRoleForm({
               name="year"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Year</FormLabel>
+                  <FormLabel className="text-gray-200">Year</FormLabel>
                   <Select
                     onValueChange={(val) => {
                       field.onChange(val);
@@ -229,11 +237,11 @@ export default function AssignRoleForm({
                     value={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a year" />
+                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                        <SelectValue placeholder="Select a year" className="text-gray-400" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-800 border-gray-700">
                       <SelectItem value="1">1</SelectItem>
                       <SelectItem value="2">2</SelectItem>
                       <SelectItem value="3">3</SelectItem>
@@ -255,9 +263,10 @@ export default function AssignRoleForm({
                       }}
                       min={5}
                       max={6}
+                      className="mt-2 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
                     />
                   )}
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
@@ -267,18 +276,18 @@ export default function AssignRoleForm({
               name="semester"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Semester</FormLabel>
+                  <FormLabel className="text-gray-200">Semester</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={!year}
                   >
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a semester" />
+                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                        <SelectValue placeholder="Select a semester" className="text-gray-400" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-800 border-gray-700">
                       {year === "1" && (
                         <>
                           <SelectItem value="1">1</SelectItem>
@@ -317,62 +326,63 @@ export default function AssignRoleForm({
                       )}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
-          </>
+          </div>
         )}
 
         {role === "TUTOR" && (
-          <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="section"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Section</FormLabel>
+                  <FormLabel className="text-gray-200">Section</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a section" />
+                      <SelectTrigger className="bg-gray-700 border-gray-600 text-white focus:ring-yellow-400 focus:ring-offset-0">
+                        <SelectValue placeholder="Select a section" className="text-gray-400" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="A">A</SelectItem>
-                      <SelectItem value="B">B</SelectItem>
-                      <SelectItem value="C">C</SelectItem>
-                      <SelectItem value="D">D</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="A" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">A</SelectItem>
+                      <SelectItem value="B" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">B</SelectItem>
+                      <SelectItem value="C" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">C</SelectItem>
+                      <SelectItem value="D" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">D</SelectItem>
+                      <SelectItem value="other" className="text-gray-300 focus:bg-gray-700 focus:text-yellow-400 hover:bg-gray-700 hover:text-yellow-400">Other</SelectItem>
                     </SelectContent>
                   </Select>
                   {field.value === "other" && (
                     <Input
                       placeholder="Enter section"
                       onChange={(e) => field.onChange(e.target.value)}
+                      className="mt-2 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
                     />
                   )}
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
-            <div className="flex space-x-4">
+
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="startRollNo"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Start Roll No</FormLabel>
+                  <FormItem>
+                    <FormLabel className="text-gray-200">Start Roll No</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         {...field}
-                        onChange={(e) =>
-                          field.onChange(Number.parseInt(e.target.value))
-                        }
+                        onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
@@ -380,26 +390,30 @@ export default function AssignRoleForm({
                 control={form.control}
                 name="endRollNo"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>End Roll No</FormLabel>
+                  <FormItem>
+                    <FormLabel className="text-gray-200">End Roll No</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         {...field}
-                        onChange={(e) =>
-                          field.onChange(Number.parseInt(e.target.value))
-                        }
+                        onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-yellow-400"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
             </div>
-          </>
+          </div>
         )}
 
-        <Button type="submit">Assign Role</Button>
+        <Button 
+          type="submit" 
+          className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300"
+        >
+          Assign Role
+        </Button>
       </form>
     </Form>
   );
